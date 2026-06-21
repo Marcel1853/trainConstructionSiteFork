@@ -1,5 +1,6 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 require 'util'
-require("__LSlib__/LSlib")
+require("compat.lslib")
 
 -- Create class
 ModCompatibility = {}

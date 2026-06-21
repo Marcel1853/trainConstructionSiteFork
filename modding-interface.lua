@@ -1,4 +1,5 @@
-require("__LSlib__/LSlib")
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
+require("compat.lslib")
 
 trainConstructionSite = trainConstructionSite or {}
 trainConstructionSite.remote = trainConstructionSite.remote or {}
@@ -13,7 +14,7 @@ trainConstructionSite.remote.addElectricTrain = function(entityType, entityName)
   --     - entityName: name of the entity (for example "electric-locomotive")
   --
   -- Timing:
-  --     - Registering a train needs to be done before __trainConstructionSite__/data-final-fixes.lua
+  --     - Registering a train needs to be done before __trainConstructionSiteFork__/data-final-fixes.lua
   --
   -- Example:
   --     - trainConstructionSite.remote.addElectricTrain("locomotive", "electric-locomotive")
@@ -36,7 +37,7 @@ trainConstructionSite.remote.addCustomFuelTrain = function(entityType, entityNam
   --     - customFuelName: name of the entity (for example "nexelit-battery")
   --
   -- Timing:
-  --     - Registering a train needs to be done before __trainConstructionSite__/data-final-fixes.lua
+  --     - Registering a train needs to be done before __trainConstructionSiteFork__/data-final-fixes.lua
   --
   -- Example:
   --     - trainConstructionSite.remote.addCustomFuelTrain("locomotive", "ht-locomotive", "nexelit-battery")

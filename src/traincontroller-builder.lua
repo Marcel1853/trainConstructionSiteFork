@@ -1,5 +1,8 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 require 'util'
-require("__LSlib__/LSlib")
+require("compat.lslib")
+local trainRecipe = require("compat.train_recipe")
+local compat = require("compat.factorio_2")
 
 -- Create class
 Traincontroller.Builder = {}
@@ -8,23 +11,19 @@ Traincontroller.Builder = {}
 -- Initiation of the class
 --------------------------------------------------------------------------------
 function Traincontroller.Builder:onInit()
-  if not global.TC_data.Builder then
-    global.TC_data.Builder = self:initGlobalData()
+  if not storage.TC_data.Builder then
+    storage.TC_data.Builder = self:initGlobalData()
   end
 end
 
-
-
 function Traincontroller.Builder:onLoad()
   -- sync the on tick event
-  if global.TC_data.Builder["onTickActive"] then
+  if storage.TC_data.Builder["onTickActive"] then
     self:activateOnTick()
   else
     self:deactivateOnTick()
   end
 end
-
-
 
 -- called when a mod setting changed
 function Traincontroller.Builder:onSettingChanged(event)
@@ -33,7 +32,7 @@ function Traincontroller.Builder:onSettingChanged(event)
     -- we need to update the on_nth_tick event (step 2), but we fist need to
     -- disable the old one if it was active (step 1), and if it was active,
     -- we have to reactivate it afther updating the settings (step 3)
-    local onTickWasActive = global.TC_data.Builder["onTickActive"]
+    local onTickWasActive = storage.TC_data.Builder["onTickActive"]
 
     -- STEP 1: disable the old active on_tick
     if onTickWasActive then
@@ -41,39 +40,34 @@ function Traincontroller.Builder:onSettingChanged(event)
     end
 
     -- STEP 2: update the settings
-    global.TC_data.Builder["onTickDelay"] = settings.global[event.setting].value
+    storage.TC_data.Builder["onTickDelay"] = settings.global[event.setting].value
 
     -- STEP 3: reactivate the on_tick with new settings
     if onTickWasActive then
       self:activateOnTick()
     end
-
   end
 end
-
-
 
 -- Initiation of the global data
 function Traincontroller.Builder:initGlobalData()
   local Builder = {
-    ["version"] = 1, -- version of the global data
+    ["version"] = 1,          -- version of the global data
     ["onTickActive"] = false, -- if the on_tick event is active or not
     ["onTickDelay"] = settings.global["trainController-tickRate"].value,
 
-    ["builderStates"] = { -- states in the builder process
+    ["builderStates"] = {   -- states in the builder process
       ["initialState"] = 1, -- what state the controller is in when it is placed down
 
-      ["dispatching" ] = 1, -- waiting till previous train clears the train block
-      ["building"    ] = 2, -- waiting on resources, building each component
-      ["idle"        ] = 3, -- wait until a depot request a train
-      ["dispatch"    ] = 4, -- assembling the train components together and let the train drive off
+      ["dispatching"] = 1,  -- waiting till previous train clears the train block
+      ["building"] = 2,     -- waiting on resources, building each component
+      ["idle"] = 3,         -- wait until a depot request a train
+      ["dispatch"] = 4,     -- assembling the train components together and let the train drive off
     },
   }
 
   return util.table.deepcopy(Builder)
 end
-
-
 
 --------------------------------------------------------------------------------
 -- Getter functions to extract data from the data structure
@@ -107,14 +101,10 @@ function Traincontroller.Builder:getBuildTrain(trainBuilderIndex)
   return train
 end
 
-
-
 function Traincontroller.Builder:getControllerStatus(trainController)
-  local position         = trainController.position
-  return global.TC_data["trainControllers"][trainController.surface.index][position.y][position.x]["controllerStatus"]
+  local position = trainController.position
+  return storage.TC_data["trainControllers"][trainController.surface.index][position.y][position.x]["controllerStatus"]
 end
-
-
 
 --------------------------------------------------------------------------------
 -- Behaviour functions
@@ -122,8 +112,8 @@ end
 function Traincontroller.Builder:updateController(surfaceIndex, position)
   -- This function will check the update for a single controller
   --game.print("Updating controller @ ["..surfaceIndex..", "..position.x..", "..position.y.."]")
-  local controllerData      = global.TC_data["trainControllers"][surfaceIndex][position.y][position.x]
-  local controllerStates    = global.TC_data.Builder["builderStates"]
+  local controllerData      = storage.TC_data["trainControllers"][surfaceIndex][position.y][position.x]
+  local controllerStates    = storage.TC_data.Builder["builderStates"]
   local controllerStatus    = controllerData["controllerStatus"]
   local oldControllerStatus = controllerStatus
   local controllerEntity    = controllerData["entity"]
@@ -164,8 +154,9 @@ function Traincontroller.Builder:updateController(surfaceIndex, position)
     -- assembling the train components together and let the train drive off
     if self:assembleNextTrain(trainBuilderIndex, controllerEntity.backer_name) then
       -- update all traincontrollers with this name
-      local trainControllers = Traincontroller:getAllTrainControllers(controllerEntity.surface.index, controllerEntity.backer_name)
-      for _,trainController in pairs(trainControllers) do
+      local trainControllers = Traincontroller:getAllTrainControllers(controllerEntity.surface.index,
+        controllerEntity.backer_name)
+      for _, trainController in pairs(trainControllers) do
         Traincontroller.Gui:updateOpenedGuis(trainController, false)
       end
       --game.print("Leaving train of length: "..#Trainassembly:getTrainBuilder(trainBuilderIndex))
@@ -175,23 +166,61 @@ function Traincontroller.Builder:updateController(surfaceIndex, position)
 
 
   -- the controller could have been removed
-  if global.TC_data["trainControllers"] and
-     global.TC_data["trainControllers"][surfaceIndex] and
-     global.TC_data["trainControllers"][surfaceIndex][position.y] and
-     global.TC_data["trainControllers"][surfaceIndex][position.y][position.x] then
-
+  if storage.TC_data["trainControllers"] and
+      storage.TC_data["trainControllers"][surfaceIndex] and
+      storage.TC_data["trainControllers"][surfaceIndex][position.y] and
+      storage.TC_data["trainControllers"][surfaceIndex][position.y][position.x] then
     -- save changes to the global data before any gui updates
-    global.TC_data["trainControllers"][surfaceIndex][position.y][position.x]["controllerStatus"] = controllerStatus
+    storage.TC_data["trainControllers"][surfaceIndex][position.y][position.x]["controllerStatus"] = controllerStatus
 
     -- update the gui if needed
     if controllerStatus ~= oldControllerStatus then
       Traincontroller.Gui:updateOpenedGuis(controllerEntity)
     end
   end
-
 end
 
+function Traincontroller.Builder:builderRailIsClear(trainBuilder)
+  -- Factorio 2.0 rail signals/hidden signal positions are not always enough to
+  -- determine that the previously dispatched train has cleared the build area.
+  -- Do one bounded occupancy scan around the whole construction site before
+  -- starting the next build. This prevents the next train from spawning into or
+  -- coupling with a train that is still leaving, while avoiding per-builder /
+  -- per-rolling-stock count queries every update.
+  local firstLocation = trainBuilder and trainBuilder[1]
+  if not firstLocation then return false end
 
+  local surface = game.get_surface(firstLocation["surfaceIndex"])
+  if not surface then return false end
+
+  local minX, minY, maxX, maxY
+  for _, builderLocation in pairs(trainBuilder) do
+    local position = builderLocation["position"]
+    if position then
+      minX = minX and math.min(minX, position.x) or position.x
+      minY = minY and math.min(minY, position.y) or position.y
+      maxX = maxX and math.max(maxX, position.x) or position.x
+      maxY = maxY and math.max(maxY, position.y) or position.y
+    end
+  end
+
+  if not minX then return false end
+
+  local margin = 10
+  local nearbyEntities = surface.find_entities_filtered {
+    area = {
+      { minX - margin, minY - margin },
+      { maxX + margin, maxY + margin },
+    },
+  }
+  for _, entity in pairs(nearbyEntities) do
+    if Trainassembly:isRollingStock(entity) then
+      return false
+    end
+  end
+
+  return true
+end
 
 function Traincontroller.Builder:canBuildNextTrain(trainBuilderIndex, trainBuilderController)
   -- We need to check for each builder if it can place a train there
@@ -199,20 +228,26 @@ function Traincontroller.Builder:canBuildNextTrain(trainBuilderIndex, trainBuild
   if not trainBuilder then return false end
   --game.print("checking if it can build a train with length: "..#trainBuilder)
 
-  -- STEP 1: Check if the train block is emtpy with the rail signal
+  -- STEP 1: Check if the construction-site rails are clear. This explicit
+  -- rolling-stock check is required in Factorio 2.0 to avoid spawning the next
+  -- train while the previous one is still leaving and can couple to it.
+  if not self:builderRailIsClear(trainBuilder) then return false end
+
+  -- STEP 2: Check if the train block is empty with the hidden rail signals.
+  --         Keep nil/invalid guards for script-created/migrated controllers.
   --         index 2: rail signal on other side of the track
   --                  => checking trainblock where the builder is
   local signalEntity = Traincontroller:getTrainHiddenEntity(trainBuilderController, 2)
-  if signalEntity.signal_state ~= defines.signal_state.open then return false end
+  if signalEntity and signalEntity.valid and signalEntity.signal_state ~= defines.signal_state.open then return false end
 
   --         index 1: rail signal on this side of the track
   --                  => checking trainblock in front of the builder
   signalEntity = Traincontroller:getTrainHiddenEntity(trainBuilderController, 1)
-  if signalEntity.signal_state ~= defines.signal_state.open then return false end
+  if signalEntity and signalEntity.valid and signalEntity.signal_state ~= defines.signal_state.open then return false end
 
   --game.print("signal was green!")
 
-  -- STEP 2: Check if each building can place the train
+  -- STEP 3: Check if each building can place the train
   for _, builderLocation in pairs(trainBuilder) do
     local machineEntity = Trainassembly:getMachineEntity(builderLocation["surfaceIndex"], builderLocation["position"])
     if machineEntity and machineEntity.valid then
@@ -221,20 +256,19 @@ function Traincontroller.Builder:canBuildNextTrain(trainBuilderIndex, trainBuild
         Traincontroller:checkValidAftherChanges(machineEntity, nil)
         return false
       end
-      local buildEntityName = LSlib.utils.string.split(machineRecipe.name, "[")[1]
-      local buildEntityName = buildEntityName:sub(1, buildEntityName:len()-6)
+      local buildEntityName = trainRecipe.parse_name(machineRecipe.name)
+      if not buildEntityName then return false end
 
-      if not game.surfaces[builderLocation["surfaceIndex"]].can_place_entity{
-        name             = buildEntityName,
-        position         = builderLocation["position"],
-        direction        = Trainassembly:getMachineDirection(machineEntity),
-        force            = machineEntity.force,
-        build_check_type = defines.build_check_type.manual
-      } then
+      if not game.surfaces[builderLocation["surfaceIndex"]].can_place_entity {
+            name             = buildEntityName,
+            position         = builderLocation["position"],
+            direction        = Trainassembly:getMachineDirection(machineEntity),
+            force            = machineEntity.force,
+            build_check_type = defines.build_check_type.manual
+          } then
         -- If we cannot place it, we can't build a train yet
         return false
       end
-
     else -- This should never have an invalid machineEntity...
       return false
     end
@@ -242,8 +276,6 @@ function Traincontroller.Builder:canBuildNextTrain(trainBuilderIndex, trainBuild
 
   return true -- if we can build everywhere, we return true eventualy
 end
-
-
 
 function Traincontroller.Builder:buildNextTrain(trainBuilderIndex)
   -- We know we can build a train, so we start building it now
@@ -262,8 +294,13 @@ function Traincontroller.Builder:buildNextTrain(trainBuilderIndex)
         Traincontroller:checkValidAftherChanges(machineEntity, nil)
         return false
       end
-      local buildEntityName = LSlib.utils.string.split(machineRecipe.name, "[")[1]
-      buildEntityName = buildEntityName:sub(1, buildEntityName:len()-6)
+      local buildEntityName = trainRecipe.parse_name(machineRecipe.name)
+      if not buildEntityName then return false end
+
+      -- Capture Space Age item quality while the train-part ingredient is still
+      -- in the input inventory. The recipe output itself is a fluid and cannot
+      -- carry quality.
+      local pendingQuality = Trainassembly:capturePendingQuality(machineEntity, machineRecipe)
 
       -- get the maybe already existing entity
       local createdEntity = Trainassembly:getCreatedEntity(builderLocation["surfaceIndex"], builderLocation["position"])
@@ -280,20 +317,22 @@ function Traincontroller.Builder:buildNextTrain(trainBuilderIndex)
           local machineDirection = Trainassembly:getMachineDirection(machineEntity)
 
           -- the recipe made a result, now we can place it
-          createdEntity = game.surfaces[builderLocation["surfaceIndex"]].create_entity{
+          createdEntity = game.surfaces[builderLocation["surfaceIndex"]].create_entity {
             name               = buildEntityName,
             position           = builderLocation["position"],
             direction          = machineDirection,
+            quality            = pendingQuality,
             force              = machineEntity.force,
             snap_to_train_stop = false,
           }
           if createdEntity and (not LSlib.utils.table.areEqual(createdEntity.position, builderLocation["position"])) then
             -- it snapped to a train stop probably, so let us build it in reverse first
             createdEntity.destroy()
-            createdEntity = game.surfaces[builderLocation["surfaceIndex"]].create_entity{
+            createdEntity = game.surfaces[builderLocation["surfaceIndex"]].create_entity {
               name               = buildEntityName,
               position           = builderLocation["position"],
               direction          = LSlib.utils.directions.oposite(machineDirection),
+              quality            = pendingQuality,
               force              = machineEntity.force,
               snap_to_train_stop = false,
             }
@@ -311,19 +350,17 @@ function Traincontroller.Builder:buildNextTrain(trainBuilderIndex)
             Trainassembly:setCreatedEntity(builderLocation["surfaceIndex"], builderLocation["position"], createdEntity)
 
             -- if this is a locomotive, we have to do some more stuff
-            local buildEntityType = LSlib.utils.string.split(machineRecipe.name, "[")
-            buildEntityType = buildEntityType[#buildEntityType]
-            buildEntityType = buildEntityType:sub(1, buildEntityType:len()-1)
+            local _, buildEntityType = trainRecipe.parse_name(machineRecipe.name)
             if buildEntityType == "locomotive" then
               -- insert fuel if recipe had fuel
-              for _,ingredient in pairs(machineRecipe.ingredients) do
+              for _, ingredient in pairs(machineRecipe.ingredients) do
                 if ingredient.name == "trainassembly-recipefuel" then
-                  createdEntity.get_fuel_inventory().insert{
+                  createdEntity.get_fuel_inventory().insert {
                     name  = "trainassembly-trainfuel",
                     count = ingredient.amount,
                   }
                 elseif Trainassembly:isFuelItem(ingredient.name) then
-                  createdEntity.get_fuel_inventory().insert{
+                  createdEntity.get_fuel_inventory().insert {
                     name  = ingredient.name,
                     count = ingredient.amount,
                   }
@@ -336,10 +373,12 @@ function Traincontroller.Builder:buildNextTrain(trainBuilderIndex)
                 r = createdEntityColor.r,
                 g = createdEntityColor.g,
                 b = createdEntityColor.b,
-                a = createdEntity.color and createdEntity.color.a or 127/255, -- hardcoded for vanilla trains
+                a = createdEntity.color and createdEntity.color.a or 127 / 255, -- hardcoded for vanilla trains
               }
-
             end
+
+            -- Quality marker consumed; the next craft will capture a new quality.
+            Trainassembly:setPendingQuality(machineEntity, "normal")
 
             -- now substract one result from the assembler
             machineOutput.amount = machineOutput.amount - 1
@@ -365,20 +404,16 @@ function Traincontroller.Builder:buildNextTrain(trainBuilderIndex)
   return finishTrainBuild
 end
 
-
-
 function Traincontroller.Builder:depotIsRequestingTrain(controllerEntity)
   local controllerName         = controllerEntity.backer_name
   local controllerSurfaceIndex = controllerEntity.surface.index
   local depotForceName         = Traincontroller:getDepotForceName(controllerEntity.force.name)
 
-  local depotRequestCount = Traindepot:getDepotRequestCount(depotForceName, controllerSurfaceIndex, controllerName)
-  local depotTrainCount   = Traindepot:getNumberOfTrainsPathingToDepot(controllerSurfaceIndex, controllerName)
+  local depotRequestCount      = Traindepot:getDepotRequestCount(depotForceName, controllerSurfaceIndex, controllerName)
+  local depotTrainCount        = Traindepot:getNumberOfTrainsPathingToDepot(controllerSurfaceIndex, controllerName)
 
   return depotTrainCount < depotRequestCount
 end
-
-
 
 function Traincontroller.Builder:assembleNextTrain(trainBuilderIndex, depotName)
   -- The whole train is assembled, so now we can send it away
@@ -391,7 +426,7 @@ function Traincontroller.Builder:assembleNextTrain(trainBuilderIndex, depotName)
   -- STEP 2a:Create the schedule
   local trainSchedule = { -- the train schedule
     -- https://lua-api.factorio.com/latest/Concepts.html#TrainSchedule
-    current = 1, -- record the train is traveling too
+    current = 1,          -- record the train is traveling too
     records = {
       -- the train schedule recods
       -- https://lua-api.factorio.com/latest/Concepts.html#TrainScheduleRecord
@@ -416,7 +451,7 @@ function Traincontroller.Builder:assembleNextTrain(trainBuilderIndex, depotName)
               second_signal = nil, -- if not set, it will compare to constant
               constant      = nil, -- if not set, will default to 0
             },
-          }, -- end of first wait condition
+          },                       -- end of first wait condition
 
         },
       }, -- end of first record
@@ -425,7 +460,7 @@ function Traincontroller.Builder:assembleNextTrain(trainBuilderIndex, depotName)
   } -- end of trainSchedule
 
   -- STEP 2b:Add the schedule to the train
-  train.schedule = trainSchedule
+  compat.set_train_schedule(train, trainSchedule)
 
   -- STEP 3: Send the train away
   -- STEP 3a:Set it in automatic mode
@@ -444,7 +479,6 @@ function Traincontroller.Builder:assembleNextTrain(trainBuilderIndex, depotName)
   return true
 end
 
-
 --------------------------------------------------------------------------------
 -- Event interface
 --------------------------------------------------------------------------------
@@ -452,38 +486,35 @@ function Traincontroller.Builder:onTick(event)
   --game.print(game.tick)
 
   -- Extract the controller that needs to be updated
-  local controller   = util.table.deepcopy(global.TC_data["nextTrainControllerIterate"])
-  local surfaceIndex = controller.surfaceIndex
-  local position     = controller.position
+  local controller     = util.table.deepcopy(storage.TC_data["nextTrainControllerIterate"])
+  local surfaceIndex   = controller.surfaceIndex
+  local position       = controller.position
 
   -- extract the next controller
   local nextController = util.table.deepcopy(
-    global.TC_data["trainControllers"][controller.surfaceIndex][controller.position.y][controller.position.x]["nextController"]
+    storage.TC_data["trainControllers"][controller.surfaceIndex][controller.position.y][controller.position.x]
+    ["nextController"]
   )
 
   -- Update the controller
   self:updateController(surfaceIndex, position)
 
   -- Increment the nextController
-  if LSlib.utils.table.areEqual(controller, global.TC_data["nextTrainControllerIterate"]) then
-    global.TC_data["nextTrainControllerIterate"] = nextController
+  if LSlib.utils.table.areEqual(controller, storage.TC_data["nextTrainControllerIterate"]) then
+    storage.TC_data["nextTrainControllerIterate"] = nextController
   end
 end
 
-
-
 function Traincontroller.Builder:activateOnTick()
   --game.print("on_tick activated")
-  script.on_nth_tick(global.TC_data.Builder["onTickDelay"], function(event)
+  script.on_nth_tick(storage.TC_data.Builder["onTickDelay"], function(event)
     self:onTick(event)
   end)
-  global.TC_data.Builder["onTickActive"] = true
+  storage.TC_data.Builder["onTickActive"] = true
 end
-
-
 
 function Traincontroller.Builder:deactivateOnTick()
   --game.print("on_tick deactivated")
-  script.on_nth_tick(global.TC_data.Builder["onTickDelay"], nil)
-  global.TC_data.Builder["onTickActive"] = false
+  script.on_nth_tick(storage.TC_data.Builder["onTickDelay"], nil)
+  storage.TC_data.Builder["onTickActive"] = false
 end

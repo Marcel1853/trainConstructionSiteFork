@@ -1,0 +1,41 @@
+{
+  "runtime.version": "Lua 5.2",
+  "diagnostics.globals": [
+    "LSlib",
+    "aai_processed_fuel_ignore",
+    "angelsmods",
+    "appmod",
+    "commands",
+    "data",
+    "defines",
+    "game",
+    "helpers",
+    "log",
+    "mods",
+    "prototypes",
+    "remote",
+    "rendering",
+    "script",
+    "serpent",
+    "settings",
+    "storage",
+    "trainConstructionSite",
+    "util"
+  ],
+  "diagnostics.disable": [
+    "assign-type-mismatch",
+    "cast-local-type",
+    "deprecated",
+    "different-requires",
+    "duplicate-set-field",
+    "inject-field",
+    "missing-fields",
+    "need-check-nil",
+    "param-type-mismatch",
+    "redefined-local",
+    "redundant-parameter",
+    "undefined-field",
+    "undefined-global"
+  ],
+  "workspace.checkThirdParty": false
+}

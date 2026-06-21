@@ -1,4 +1,6 @@
-require("__LSlib__/LSlib")
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
+require("compat.lslib")
+local compat = require("compat.factorio_2")
 
 -- To make sure everything is inline with the technology tree when the mod is added.
 -- This is for when the mod is added into an existing game or when the mod is updated.
@@ -9,9 +11,9 @@ require("src.traincontroller")
 require("src.traindepot")
 
 return function(configurationData)
-  local modChanges = configurationData.mod_changes["trainConstructionSite"]
+  local modChanges = configurationData.mod_changes["trainConstructionSiteFork"] or configurationData.mod_changes["trainConstructionSite"]
   if modChanges and modChanges.new_version ~= (modChanges.old_version or "") then
-    log(string.format("Updating trainConstructionSite from version %q to version %q", modChanges.old_version or "nil", modChanges.new_version))
+    log(string.format("Updating trainConstructionSiteFork from version %q to version %q", modChanges.old_version or "nil", modChanges.new_version))
 
     --------------------------------------------------
     -- Prototype data                               --
@@ -38,34 +40,34 @@ return function(configurationData)
     --------------------------------------------------
     -- Trainassembly script                         --
     --------------------------------------------------
-    if global.TA_data.version == 1 then
+    if storage.TA_data.version == 1 then
       log("Updating Trainassembly from version 1 to version 2.")
-      global.TA_data.prototypeData.trainTint = {}
-      global.TA_data.version = 2
+      storage.TA_data.prototypeData.trainTint = {}
+      storage.TA_data.version = 2
     end
 
-    if global.TA_data.version == 2 then
+    if storage.TA_data.version == 2 then
       log("Updating Trainassembly from version 2 to version 3.")
-      global.TA_data.prototypeData.rollingStock =
+      storage.TA_data.prototypeData.rollingStock =
       {
         ["locomotive"     ] = true,
         ["cargo-wagon"    ] = true,
         ["fluid-wagon"    ] = true,
         ["artillery-wagon"] = true,
       }
-      global.TA_data.version = 3
+      storage.TA_data.version = 3
     end
 
-    if global.TA_data.version == 3 then
+    if storage.TA_data.version == 3 then
       log("Updating Trainassembly from version 3 to version 4.")
-      for machineSurface,machineSurfaceData in pairs(global.TA_data and global.TA_data["trainAssemblers"] or {}) do
+      for machineSurface,machineSurfaceData in pairs(storage.TA_data and storage.TA_data["trainAssemblers"] or {}) do
         for machinePositionY, machinePositionData in pairs(machineSurfaceData) do
           for machinePositionX, machineData in pairs(machinePositionData) do
             local renderIDs = {}
             local machineEntity = machineData.entity
             for animationLayer,renderLayer in pairs{
-              ["base"] = 124,
-              ["overlay"] = 133
+              ["base"] = "lower-object",
+              ["overlay"] = "item-in-inserter-hand"
             } do
               renderIDs[animationLayer] = rendering.draw_animation{
                 animation = machineEntity.name .. "-" .. LSlib.utils.directions.toString(machineEntity.direction) .. "-" .. animationLayer,
@@ -74,17 +76,17 @@ return function(configurationData)
                 surface = machineEntity.surface,
               }
             end
-            global.TA_data["trainAssemblers"][machineSurface][machinePositionY][machinePositionX]["renderID"] = renderIDs
+            storage.TA_data["trainAssemblers"][machineSurface][machinePositionY][machinePositionX]["renderID"] = renderIDs
           end
         end
       end
-      global.TA_data.version = 4
+      storage.TA_data.version = 4
     end
 
-    if global.TA_data.version == 4 then
+    if storage.TA_data.version == 4 then
       log("Updating Trainassembly from version 4 to version 5.")
       local trainBuilderIndices = {}
-      for machineSurface,machineSurfaceData in pairs(global.TA_data and global.TA_data["trainAssemblers"] or {}) do
+      for machineSurface,machineSurfaceData in pairs(storage.TA_data and storage.TA_data["trainAssemblers"] or {}) do
         for machinePositionY, machinePositionData in pairs(machineSurfaceData) do
           for machinePositionX, machineData in pairs(machinePositionData) do
             trainBuilderIndices[machineData.trainBuilderIndex] = (trainBuilderIndices[machineData.trainBuilderIndex] or 0) + 1
@@ -95,13 +97,13 @@ return function(configurationData)
           end
         end
       end
-      for trainBuilderIndex, trainBuilder in pairs(global.TA_data and global.TA_data["trainBuilders"] or {}) do
+      for trainBuilderIndex, trainBuilder in pairs(storage.TA_data and storage.TA_data["trainBuilders"] or {}) do
         if trainBuilderIndices[trainBuilderIndex] then
         else
           local newTrainBuilder = {}
           for _, trainAssembler in pairs(trainBuilder) do
             local found = false
-            for machineSurface,machineSurfaceData in pairs(global.TA_data and global.TA_data["trainAssemblers"] or {}) do
+            for machineSurface,machineSurfaceData in pairs(storage.TA_data and storage.TA_data["trainAssemblers"] or {}) do
               if trainAssembler.surfaceIndex == machineSurface then
                 for machinePositionY, machinePositionData in pairs(machineSurfaceData) do
                   if trainAssembler.position.y == machinePositionY then
@@ -119,30 +121,93 @@ return function(configurationData)
             end
           end
           if #newTrainBuilder > 0 then
-            global.TA_data["trainBuilders"][trainBuilderIndex] = newTrainBuilder
+            storage.TA_data["trainBuilders"][trainBuilderIndex] = newTrainBuilder
           else
-            global.TA_data["trainBuilders"][trainBuilderIndex] = nil
+            storage.TA_data["trainBuilders"][trainBuilderIndex] = nil
           end
         end
       end
-      global.TA_data.version = 5
+      storage.TA_data.version = 5
     end
+
+    if storage.TA_data.version == 5 then
+      log("Updating Trainassembly from version 5 to version 6 (Factorio 2.0 directions).")
+      local oldToNewDirection = {
+        [0] = defines.direction.north,
+        [2] = defines.direction.east,
+        [4] = defines.direction.south,
+        [6] = defines.direction.west,
+      }
+      for _, machineSurfaceData in pairs(storage.TA_data and storage.TA_data["trainAssemblers"] or {}) do
+        for _, machinePositionData in pairs(machineSurfaceData) do
+          for _, machineData in pairs(machinePositionData) do
+            if machineData.direction ~= nil and oldToNewDirection[machineData.direction] ~= nil then
+              machineData.direction = oldToNewDirection[machineData.direction]
+            end
+            if machineData.entity and machineData.entity.valid and machineData.renderID then
+              for _, animationLayer in pairs{"base", "overlay"} do
+                compat.set_render_animation(machineData.renderID[animationLayer], machineData.entity.name .. "-" .. LSlib.utils.directions.toString(machineData.direction or machineData.entity.direction) .. "-" .. animationLayer)
+              end
+            end
+          end
+        end
+      end
+      storage.TA_data.version = 6
+    end
+
+    if storage.TA_data.version == 6 then
+      log("Updating Trainassembly from version 6 to version 7 (blueprintable protected rails).")
+      for _, machineSurfaceData in pairs(storage.TA_data and storage.TA_data["trainAssemblers"] or {}) do
+        for _, machinePositionData in pairs(machineSurfaceData) do
+          for _, machineData in pairs(machinePositionData) do
+            local machineEntity = machineData.entity
+            if machineEntity and machineEntity.valid then
+              for _, railEntity in pairs(machineEntity.surface.find_entities_filtered{
+                name = "straight-rail",
+                type = "straight-rail",
+                area = {
+                  {machineEntity.position.x - 3.1, machineEntity.position.y - 3.1},
+                  {machineEntity.position.x + 3.1, machineEntity.position.y + 3.1},
+                },
+              }) do
+                railEntity.destructible = false
+                railEntity.minable = true -- keep rails selectable/blueprintable
+              end
+            end
+          end
+        end
+      end
+      storage.TA_data.version = 7
+    end
+
+    if storage.TA_data.version == 7 then
+      log("Updating Trainassembly from version 7 to version 8 (quality support).")
+      for _, machineSurfaceData in pairs(storage.TA_data and storage.TA_data["trainAssemblers"] or {}) do
+        for _, machinePositionData in pairs(machineSurfaceData) do
+          for _, machineData in pairs(machinePositionData) do
+            machineData.pendingQuality = machineData.pendingQuality or "normal"
+          end
+        end
+      end
+      storage.TA_data.version = 8
+    end
+
 
     --------------------------------------------------
     -- Traincontroller script                       --
     --------------------------------------------------
-    if global.TC_data.version == 1 then
+    if storage.TC_data.version == 1 then
       log("Updating Traincontroller from version 1 to version 2.")
-      if LSlib.utils.table.isEmpty(global.TC_data["trainControllers"]) and global.TC_data["nextTrainControllerIterate"] then
-        global.TC_data["nextTrainControllerIterate"] = nil
+      if LSlib.utils.table.isEmpty(storage.TC_data["trainControllers"]) and storage.TC_data["nextTrainControllerIterate"] then
+        storage.TC_data["nextTrainControllerIterate"] = nil
         Traincontroller.Builder:deactivateOnTick()
       end
-      global.TC_data.version = 2
+      storage.TC_data.version = 2
     end
 
-    if global.TC_data.version == 2 then
+    if storage.TC_data.version == 2 then
       log("Updating Traincontroller from version 2 to version 3.")
-      for surfaceIndex, surfaceData in pairs(global.TC_data["trainControllers"] or {}) do
+      for surfaceIndex, surfaceData in pairs(storage.TC_data["trainControllers"] or {}) do
         for controllerPositionY, controllerPositionData in pairs(surfaceData) do
           for controllerPositionX, controllerData in pairs(controllerPositionData) do
             for _, hiddenEntity in pairs(controllerData["entity-hidden"]) do
@@ -160,10 +225,11 @@ return function(configurationData)
                 force     = Traincontroller:getDepotForceName(controllerEntity.force.name)
               }
             end
-            if global.TA_data["trainBuilders"][controllerData.trainBuilderIndex] then
+            if storage.TA_data["trainBuilders"][controllerData.trainBuilderIndex] then
             else
               local controllerEntity = controllerData.entity
               if controllerEntity and controllerEntity.valid then
+                local createdEntityForceName = storage.TC_data["trainControllerForces"][controllerEntity.force.name] or controllerEntity.force.name
                 local entityDirection = controllerEntity.direction
                 local entitySearchDirection = {
                   x = (entityDirection == defines.direction.west  and 1 or 0) + (entityDirection == defines.direction.east  and -1 or 0),
@@ -197,31 +263,56 @@ return function(configurationData)
           end
         end
       end
-      global.TC_data.version = 3
+      storage.TC_data.version = 3
     end
+
+    if storage.TC_data.version == 3 then
+      log("Updating Traincontroller from version 3 to version 4.")
+      storage.TC_data["pendingControllers"] = storage.TC_data["pendingControllers"] or {}
+      for _, surface in pairs(game.surfaces) do
+        for _, signal in pairs(surface.find_entities_filtered{name = Traincontroller:getControllerSignalEntityName()}) do
+          if signal and signal.valid then signal.destroy() end
+        end
+      end
+      for _, surfaceData in pairs(storage.TC_data["trainControllers"] or {}) do
+        for _, positionYData in pairs(surfaceData) do
+          for _, controllerData in pairs(positionYData) do
+            for hiddenEntityIndex, hiddenEntity in pairs(controllerData["entity-hidden"] or {}) do
+              if hiddenEntity and hiddenEntity.valid and hiddenEntity.name == Traincontroller:getControllerSignalEntityName() then
+                hiddenEntity.destroy()
+                controllerData["entity-hidden"][hiddenEntityIndex] = nil
+              end
+            end
+          end
+        end
+      end
+      storage.TC_data.version = 4
+      Traincontroller:syncPendingControllerTick()
+    end
+
 
     --------------------------------------------------
     -- Traincontroller.Gui script                   --
     --------------------------------------------------
-    if global.TC_data.Gui.version == 1 then
+    if storage.TC_data.Gui.version == 1 then
       log("Updating Traincontroller.Gui from version 1 to version 2.")
-      global.TC_data.Gui["prototypeData"]["trainControllerGui"] = trainControllerGui
-      global.TC_data.Gui.version = 2
+      storage.TC_data.Gui["prototypeData"]["trainControllerGui"] = trainControllerGui
+      storage.TC_data.Gui.version = 2
     end
 
-    if global.TC_data.Gui.version == 2 then
+    if storage.TC_data.Gui.version == 2 then
       log("Updating Traincontroller.Gui from version 2 to version 3.")
-      global.TC_data.Gui["clickHandler"] = nil
-      global.TC_data.Gui.version = 3
+      storage.TC_data.Gui["clickHandler"] = nil
+      storage.TC_data.Gui.version = 3
     end
 
-    if global.TC_data.Gui.version == 3 then
+    if storage.TC_data.Gui.version == 3 then
       log("Updating Traincontroller.Gui from version 3 to version 4.")
-      global.TC_data.Gui["prototypeData"]["trainControllerGui"] = trainControllerGui
-      global.TC_data.Gui.version = 4
+      storage.TC_data.Gui["prototypeData"]["trainControllerGui"] = trainControllerGui
+      storage.TC_data.Gui.version = 4
     end
 
-    if global.TC_data.Gui.version == 4 then
+    if storage.TC_data.Gui.version == 4 then
       log("Updating Traincontroller.Gui from version 4 to version 5.")
       for playerIndex, _ in pairs(game.players) do
         if Traincontroller.Gui:hasOpenedGui(playerIndex) then
@@ -229,21 +320,58 @@ return function(configurationData)
           Traincontroller.Gui:setOpenedControllerEntity(playerIndex, nil)
         end
       end
-      global.TC_data.Gui["prototypeData"] = Traincontroller.Gui:initPrototypeData()
-      global.TC_data.Gui.version = 5
+      storage.TC_data.Gui["prototypeData"] = Traincontroller.Gui:initPrototypeData()
+      storage.TC_data.Gui.version = 5
     end
+
+    if storage.TC_data.Gui.version == 5 then
+      log("Updating Traincontroller.Gui from version 5 to version 6.")
+      for playerIndex, _ in pairs(game.players) do
+        if Traincontroller.Gui:hasOpenedGui(playerIndex) then
+          game.players[playerIndex].opened = Traincontroller.Gui:destroyGui(playerIndex)
+          Traincontroller.Gui:setOpenedControllerEntity(playerIndex, nil)
+        end
+      end
+      storage.TC_data.Gui["prototypeData"] = Traincontroller.Gui:initPrototypeData()
+      storage.TC_data.Gui.version = 6
+    end
+
+    if storage.TC_data.Gui.version == 6 then
+      log("Updating Traincontroller.Gui from version 6 to version 7.")
+      for playerIndex, _ in pairs(game.players) do
+        if Traincontroller.Gui:hasOpenedGui(playerIndex) then
+          game.players[playerIndex].opened = Traincontroller.Gui:destroyGui(playerIndex)
+          Traincontroller.Gui:setOpenedControllerEntity(playerIndex, nil)
+        end
+      end
+      storage.TC_data.Gui["prototypeData"] = Traincontroller.Gui:initPrototypeData()
+      storage.TC_data.Gui.version = 7
+    end
+
+    if storage.TC_data.Gui.version == 7 then
+      log("Updating Traincontroller.Gui from version 7 to version 8.")
+      for playerIndex, _ in pairs(game.players) do
+        if Traincontroller.Gui:hasOpenedGui(playerIndex) then
+          game.players[playerIndex].opened = Traincontroller.Gui:destroyGui(playerIndex)
+          Traincontroller.Gui:setOpenedControllerEntity(playerIndex, nil)
+        end
+      end
+      storage.TC_data.Gui["prototypeData"] = Traincontroller.Gui:initPrototypeData()
+      storage.TC_data.Gui.version = 8
+    end
+
 
     --------------------------------------------------
     -- Traindepot script                            --
     --------------------------------------------------
-    if global.TD_data.version == 1 then
+    if storage.TD_data.version == 1 then
       log("Updating Traindepot from version 1 to version 2.")
-      global.TD_data.version = 2
+      storage.TD_data.version = 2
     end
 
-    if global.TD_data.version == 2 then 
+    if storage.TD_data.version == 2 then 
       log("Updating Traindepot from version 2 to version 3.")
-      for depotSurfaceIndex, depotSurfaceData in pairs(global.TD_data["depots"]) do 
+      for depotSurfaceIndex, depotSurfaceData in pairs(storage.TD_data["depots"]) do 
         for depotPositionY,depotPositionList in pairs(depotSurfaceData) do
           for depotPositionX,depotEntityData in pairs(depotPositionList) do
             local depotEntity = depotEntityData.entity
@@ -257,16 +385,16 @@ return function(configurationData)
                 limit = 1,
               }[1]
               if foundEntity then
-                global.TD_data["depots"][depotSurfaceIndex][depotPositionX][depotPositionY].entity = foundEntity
+                storage.TD_data["depots"][depotSurfaceIndex][depotPositionX][depotPositionY].entity = foundEntity
               else
-                if global.TD_data["depots"][depotSurfaceIndex][depotPositionY][depotPositionX] then
-                  global.TD_data["depots"][depotSurfaceIndex][depotPositionY][depotPositionX] = nil
+                if storage.TD_data["depots"][depotSurfaceIndex][depotPositionY][depotPositionX] then
+                  storage.TD_data["depots"][depotSurfaceIndex][depotPositionY][depotPositionX] = nil
 
-                  if LSlib.utils.table.isEmpty(global.TD_data["depots"][depotSurfaceIndex][depotPositionY]) then
-                    global.TD_data["depots"][depotSurfaceIndex][depotPositionY] = nil
+                  if LSlib.utils.table.isEmpty(storage.TD_data["depots"][depotSurfaceIndex][depotPositionY]) then
+                    storage.TD_data["depots"][depotSurfaceIndex][depotPositionY] = nil
 
-                    if LSlib.utils.table.isEmpty(global.TD_data["depots"][depotSurfaceIndex]) then
-                      global.TD_data["depots"][depotSurfaceIndex] = nil
+                    if LSlib.utils.table.isEmpty(storage.TD_data["depots"][depotSurfaceIndex]) then
+                      storage.TD_data["depots"][depotSurfaceIndex] = nil
                     end
                   end
                 end
@@ -275,31 +403,31 @@ return function(configurationData)
           end
         end
       end
-      global.TD_data.version = 3
+      storage.TD_data.version = 3
     end
 
     --------------------------------------------------
     -- Traindepot.Gui script                        --
     --------------------------------------------------
-    if global.TD_data.Gui.version == 1 then
+    if storage.TD_data.Gui.version == 1 then
       log("Updating Traindepot.Gui from version 1 to version 2.")
-      global.TD_data.Gui["prototypeData"]["trainDepotGui"] = trainDepotGui
-      global.TD_data.Gui.version = 2
+      storage.TD_data.Gui["prototypeData"]["trainDepotGui"] = trainDepotGui
+      storage.TD_data.Gui.version = 2
     end
 
-    if global.TD_data.Gui.version == 2 then
+    if storage.TD_data.Gui.version == 2 then
       log("Updating Traindepot.Gui from version 2 to version 3.")
-      global.TD_data.Gui["clickHandler"] = nil
-      global.TD_data.Gui.version = 3
+      storage.TD_data.Gui["clickHandler"] = nil
+      storage.TD_data.Gui.version = 3
     end
 
-    if global.TD_data.Gui.version == 3 then
+    if storage.TD_data.Gui.version == 3 then
       log("Updating Traindepot.Gui from version 3 to version 4.")
-      global.TD_data.Gui["prototypeData"]["trainDepotGui"] = trainDepotGui
-      global.TD_data.Gui.version = 4
+      storage.TD_data.Gui["prototypeData"]["trainDepotGui"] = trainDepotGui
+      storage.TD_data.Gui.version = 4
     end
 
-    if global.TD_data.Gui.version == 4 then
+    if storage.TD_data.Gui.version == 4 then
       log("Updating Traindepot.Gui from version 4 to version 5.")
       for playerIndex, _ in pairs(game.players) do 
         if Traindepot.Gui:hasOpenedGui(playerIndex) then
@@ -307,33 +435,70 @@ return function(configurationData)
           game.players[playerIndex].opened = Traindepot.Gui:destroyGui(playerIndex)
         end
       end
-      global.TD_data.Gui["prototypeData"] = Traindepot.Gui:initPrototypeData()
-      global.TD_data.Gui.version = 5
+      storage.TD_data.Gui["prototypeData"] = Traindepot.Gui:initPrototypeData()
+      storage.TD_data.Gui.version = 5
     end
+
+    if storage.TD_data.Gui.version == 5 then
+      log("Updating Traindepot.Gui from version 5 to version 6.")
+      for playerIndex, _ in pairs(game.players) do
+        if Traindepot.Gui:hasOpenedGui(playerIndex) then
+          game.players[playerIndex].opened = Traindepot.Gui:destroyGui(playerIndex)
+          Traindepot.Gui:setOpenedEntity(playerIndex, nil)
+        end
+      end
+      storage.TD_data.Gui["prototypeData"] = Traindepot.Gui:initPrototypeData()
+      storage.TD_data.Gui.version = 6
+    end
+
+    if storage.TD_data.Gui.version == 6 then
+      log("Updating Traindepot.Gui from version 6 to version 7.")
+      for playerIndex, _ in pairs(game.players) do
+        if Traindepot.Gui:hasOpenedGui(playerIndex) then
+          game.players[playerIndex].opened = Traindepot.Gui:destroyGui(playerIndex)
+          Traindepot.Gui:setOpenedEntity(playerIndex, nil)
+        end
+      end
+      storage.TD_data.Gui["prototypeData"] = Traindepot.Gui:initPrototypeData()
+      storage.TD_data.Gui.version = 7
+    end
+
+    if storage.TD_data.Gui.version == 7 then
+      log("Updating Traindepot.Gui from version 7 to version 8.")
+      for playerIndex, _ in pairs(game.players) do
+        if Traindepot.Gui:hasOpenedGui(playerIndex) then
+          game.players[playerIndex].opened = Traindepot.Gui:destroyGui(playerIndex)
+          Traindepot.Gui:setOpenedEntity(playerIndex, nil)
+        end
+      end
+      storage.TD_data.Gui["prototypeData"] = Traindepot.Gui:initPrototypeData()
+      storage.TD_data.Gui.version = 8
+    end
+
 
     --------------------------------------------------
     -- Help.Gui script                              --
     --------------------------------------------------
-    if global.H_data and global.H_data.Gui then
-      if global.H_data.Gui.version then
-        log("Removing Help.Gui version "..(global.H_data.Gui.version or "unknown")..".")
+    if storage.H_data and storage.H_data.Gui then
+      if storage.H_data.Gui.version then
+        log("Removing Help.Gui version "..(storage.H_data.Gui.version or "unknown")..".")
       end
       for player_index, _ in pairs(game.players) do
-        if global.H_data.Gui["openedGui"][playerIndex] then
-          global.H_data.Gui["openedGui"][playerIndex].destroy()
+        if storage.H_data.Gui["openedGui"][player_index] then
+          storage.H_data.Gui["openedGui"][player_index].destroy()
         end
       end
-      global.H_data.Gui = nil
+      storage.H_data.Gui = nil
     end
 
     --------------------------------------------------
     -- Help script                                  --
     --------------------------------------------------
-    if global.H_data then
-      if global.H_data.version then
-        log("Removing Help version "..(global.H_data.version or "unknown")..".")
+    if storage.H_data then
+      if storage.H_data.version then
+        log("Removing Help version "..(storage.H_data.version or "unknown")..".")
       end
-      global.H_data = nil
+      storage.H_data = nil
     end
 
   end

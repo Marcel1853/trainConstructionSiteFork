@@ -1,5 +1,7 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 require 'util'
-require("__LSlib__/LSlib")
+require("compat.lslib")
+local trainRecipe = require("compat.train_recipe")
 
 -- Create class
 Traincontroller.Gui = {}
@@ -9,8 +11,8 @@ Traincontroller.Gui.rotateEventID = script.generate_event_name()
 -- Initiation of the class
 --------------------------------------------------------------------------------
 function Traincontroller.Gui:onInit()
-  if not global.TC_data.Gui then
-    global.TC_data.Gui = self:initGlobalData()
+  if not storage.TC_data.Gui then
+    storage.TC_data.Gui = self:initGlobalData()
     self:initEntityPreviewSurface()
   end
 end
@@ -20,7 +22,7 @@ end
 -- Initiation of the global data
 function Traincontroller.Gui:initGlobalData()
   local gui = {
-    ["version"       ] = 5, -- version of the global data
+    ["version"       ] = 8, -- version of the global data
     ["surfaceName"   ] = "trainConstructionSite",
     ["prototypeData" ] = self:initPrototypeData(), -- data storing info about the prototypes
     ["openedEntities"] = {}, -- opened entity for each player
@@ -389,12 +391,14 @@ function Traincontroller.Gui:initClickHandlers()
         local createdEntity = Trainassembly:getCreatedEntity(trainAssemblerLocation.surfaceIndex, trainAssemblerLocation.position)
         if createdEntity then
           local createdEntityColor = Trainassembly:getMachineTint(trainAssemblerEntity)
-          createdEntity.color = {
-            r = createdEntityColor.r,
-            g = createdEntityColor.g,
-            b = createdEntityColor.b,
-            a = createdEntity.color and createdEntity.color.a or 127/255, -- hardcoded for vanilla trains
-          }
+          if createdEntityColor then
+            createdEntity.color = {
+              r = createdEntityColor.r,
+              g = createdEntityColor.g,
+              b = createdEntityColor.b,
+              a = createdEntity.color and createdEntity.color.a or 127/255, -- hardcoded for vanilla trains
+            }
+          end
         end
 
         -- STEP 6: update opened UI's
@@ -543,6 +547,7 @@ function Traincontroller.Gui:initClickHandlers()
 
   clickHandlers["selected-depot-enter"] = function(clickedElement, playerIndex)
     local controllerEntity  = Traincontroller.Gui:getOpenedControllerEntity(playerIndex)
+    if not (controllerEntity and controllerEntity.valid) then return end
     local oldControllerName = controllerEntity.backer_name
     local newControllerName = LSlib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("selected-depot-name")).caption
 
@@ -568,19 +573,19 @@ Traincontroller.Gui.clickHandlers = Traincontroller.Gui:initClickHandlers()
 -- Setter functions to alter data into the data structure
 --------------------------------------------------------------------------------
 function Traincontroller.Gui:setOpenedControllerEntity(playerIndex, openedEntity)
-  if not global.TC_data.Gui["openedEntities"][playerIndex] then
-    global.TC_data.Gui["openedEntities"][playerIndex] = {}
+  if not storage.TC_data.Gui["openedEntities"][playerIndex] then
+    storage.TC_data.Gui["openedEntities"][playerIndex] = {}
   end
-  global.TC_data.Gui["openedEntities"][playerIndex]["traincontroller"] = openedEntity
+  storage.TC_data.Gui["openedEntities"][playerIndex]["traincontroller"] = openedEntity
 end
 
 
 
 function Traincontroller.Gui:setOpenedRecipeEntity(playerIndex, openedEntity)
-  if not global.TC_data.Gui["openedEntities"][playerIndex] then
-    global.TC_data.Gui["openedEntities"][playerIndex] = {}
+  if not storage.TC_data.Gui["openedEntities"][playerIndex] then
+    storage.TC_data.Gui["openedEntities"][playerIndex] = {}
   end
-  global.TC_data.Gui["openedEntities"][playerIndex]["traincontroller-recipe"] = openedEntity
+  storage.TC_data.Gui["openedEntities"][playerIndex]["traincontroller-recipe"] = openedEntity
 end
 
 
@@ -589,30 +594,30 @@ end
 -- Getter functions to extract data from the data structure
 --------------------------------------------------------------------------------
 function Traincontroller.Gui:getControllerSurfaceName()
-  return global.TC_data.Gui["surfaceName"]
+  return storage.TC_data.Gui["surfaceName"]
 end
 
 
 
 function Traincontroller.Gui:getControllerGuiLayout()
-  return global.TC_data.Gui["prototypeData"]["trainControllerGui"]
+  return storage.TC_data.Gui["prototypeData"]["trainControllerGui"]
 end
 
 
 
 function Traincontroller.Gui:getRecipeSelectorEntityName()
-  return global.TC_data.Gui["prototypeData"]["recipeSelector"]
+  return storage.TC_data.Gui["prototypeData"]["recipeSelector"]
 end
 
 
 
 function Traincontroller.Gui:getTabElementPath(guiElementName)
-  return global.TC_data.Gui["prototypeData"]["tabButtonPath"][guiElementName]
+  return storage.TC_data.Gui["prototypeData"]["tabButtonPath"][guiElementName]
 end
 
 
 function Traincontroller.Gui:getUpdateElementPath(guiElementName)
-  return global.TC_data.Gui["prototypeData"]["updateElementPath"][guiElementName]
+  return storage.TC_data.Gui["prototypeData"]["updateElementPath"][guiElementName]
 end
 
 
@@ -637,7 +642,7 @@ end
 
 function Traincontroller.Gui:getOpenedControllerStatusString(playerIndex)
   local controllerStatus = Traincontroller.Builder:getControllerStatus(self:getOpenedControllerEntity(playerIndex))
-  local controllerStates  = global.TC_data.Builder["builderStates"]
+  local controllerStates  = storage.TC_data.Builder["builderStates"]
 
   if controllerStatus == controllerStates["idle"] then
     -- wait until a depot request a train
@@ -661,8 +666,8 @@ end
 
 
 function Traincontroller.Gui:getOpenedControllerEntity(playerIndex)
-  if global.TC_data.Gui["openedEntities"][playerIndex] then
-    return global.TC_data.Gui["openedEntities"][playerIndex]["traincontroller"]
+  if storage.TC_data.Gui["openedEntities"][playerIndex] then
+    return storage.TC_data.Gui["openedEntities"][playerIndex]["traincontroller"]
   else
     return nil
   end
@@ -671,8 +676,8 @@ end
 
 
 function Traincontroller.Gui:getOpenedRecipeEntity(playerIndex)
-  if global.TC_data.Gui["openedEntities"][playerIndex] then
-    return global.TC_data.Gui["openedEntities"][playerIndex]["traincontroller-recipe"]
+  if storage.TC_data.Gui["openedEntities"][playerIndex] then
+    return storage.TC_data.Gui["openedEntities"][playerIndex]["traincontroller-recipe"]
   else
     return nil
   end
@@ -690,6 +695,9 @@ end
 -- Gui functions
 --------------------------------------------------------------------------------
 function Traincontroller.Gui:createGui(playerIndex)
+  -- Refresh cached layout data so saves created with older port builds don't keep
+  -- removed Factorio 2.0 utility sprites such as utility/close_white.
+  storage.TC_data.Gui["prototypeData"] = self:initPrototypeData()
   local trainDepoGui = LSlib.gui.create(playerIndex, self:getControllerGuiLayout())
   self:updateGuiInfo(playerIndex)
   return trainDepoGui
@@ -720,10 +728,10 @@ function Traincontroller.Gui:updateGuiInfo(playerIndex)
     self:onCloseEntity(trainDepotGui, playerIndex)
   end
 
-  local controllerName         = openedEntity.backer_name or ""
-  local controllerForceName    = openedEntity.force.name or ""
-  local controllerSurfaceIndex = openedEntity.surface.index or game.get_player(playerIndex).surface.index or 1
-  local controllerDirection    = openedEntity.direction or defines.direction.north
+  local controllerName         = (openedEntity and openedEntity.backer_name) or ""
+  local controllerForceName    = (openedEntity and openedEntity.force and openedEntity.force.name) or ""
+  local controllerSurfaceIndex = (openedEntity and openedEntity.surface and openedEntity.surface.index) or (game.get_player(playerIndex) and game.get_player(playerIndex).surface and game.get_player(playerIndex).surface.index) or 1
+  local controllerDirection    = (openedEntity and openedEntity.direction) or defines.direction.north
 
   local depotForceName    = Traincontroller:getDepotForceName(controllerForceName)
   local depotRequestCount = Traindepot:getDepotRequestCount(depotForceName, controllerSurfaceIndex, controllerName)
@@ -795,8 +803,7 @@ function Traincontroller.Gui:updateGuiInfo(playerIndex)
           sprite = string.format("fluid/%s", trainAssemblerRecipe.products[1].name),
         }
 
-        local trainAssemblyType = LSlib.utils.string.split(trainAssemblerRecipe.name, "[")[2]
-        trainAssemblyType = trainAssemblyType:sub(1, trainAssemblyType:len()-1)
+        local _, trainAssemblyType = trainRecipe.parse_name(trainAssemblerRecipe.name)
         if trainAssemblyType == "locomotive"      or
            trainAssemblyType == "artillery-wagon" then
           flow.add{

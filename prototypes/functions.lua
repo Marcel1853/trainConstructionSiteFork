@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 local tooltipCategoryColor = { r = 255, g = 210, b = 73 }
 local tooltipParameterColor = { r = 255, g = 230, b = 192 }
 
@@ -66,9 +67,9 @@ local createStorageLocalisedDescription = function(trainType, trainName, addLead
   local localised_description = {""}
 
   if trainType == "cargo-wagon" then
-    table.insert(localised_description, createTooltipParameter("storage-size", LSlib.utils.units.getLocalisedUnit(entityPrototype.inventory_size, {""}), nil, addLeadingNewLine))
+    table.insert(localised_description, createTooltipParameter("storage-size", LSlib.utils.units.getLocalisedUnit(entityPrototype.inventory_size, {""}), addLeadingNewLine))
   elseif trainType == "fluid-wagon" then
-    table.insert(localised_description, createTooltipParameter("fluid-capacity", LSlib.utils.units.getLocalisedUnit(entityPrototype.capacity, {""}), nil, addLeadingNewLine))
+    table.insert(localised_description, createTooltipParameter("fluid-capacity", LSlib.utils.units.getLocalisedUnit(entityPrototype.capacity, {""}), addLeadingNewLine))
   end
 
   return localised_description
@@ -176,24 +177,23 @@ local createEnergySourceLocalisedDescription = function(trainType, trainName, ad
 
   local localised_description = {""}
 
-  if entityPrototype.burner or (entityPrototype.energy_source and entityPrototype.energy_source.type == "burner") then
+  local burner = (entityPrototype.energy_source and entityPrototype.energy_source.type == "burner" and entityPrototype.energy_source) or entityPrototype.burner
+  if burner then
     local containsCategory = function(categoryName)
-      if entityPrototype.burner.fuel_category then
-        return entityPrototype.burner.fuel_category == categoryName
-      end
-      if entityPrototype.burner.fuel_categories then
-        for _,category in pairs(entityPrototype.burner.fuel_categories) do
+      if burner.fuel_categories then
+        for _,category in pairs(burner.fuel_categories) do
           if category == categoryName then return true end
         end
       end
       return false
     end
+    local firstCategory = burner.fuel_categories and burner.fuel_categories[1] or "TCS-none"
     if containsCategory("chemical") then
       table.insert(localised_description, createTooltipCategory("tooltip-category-chemical", "consumes", {"", " ", {"fuel-category-name.chemical"}}, addLeadingNewLine))
     elseif containsCategory("nuclear") then
       table.insert(localised_description, createTooltipCategory("tooltip-category-nuclear", "consumes", {"", " ", {"fuel-category-name.nuclear"}}, addLeadingNewLine))
     else
-      table.insert(localised_description, createTooltipCategory("tooltip-category-consumes", "consumes", {"", " ", {string.format("fuel-category-name.%s", entityPrototype.burner.fuel_category or (entityPrototype.burner.fuel_categories and next(entityPrototype.burner.fuel_categories)) or "TCS-none")}}, addLeadingNewLine))
+      table.insert(localised_description, createTooltipCategory("tooltip-category-consumes", "consumes", {"", " ", {string.format("fuel-category-name.%s", firstCategory)}}, addLeadingNewLine))
     end
     table.insert(localised_description, createTooltipParameter("max-energy-consumption", LSlib.utils.units.getLocalisedUnit(convertEnergyStringToValue(entityPrototype.max_power), {"si-unit-symbol-watt"}, 2), true))
 

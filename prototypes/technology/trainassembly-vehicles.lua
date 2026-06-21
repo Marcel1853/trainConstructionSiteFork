@@ -1,3 +1,5 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
+local trainRecipeName = require("compat.train_recipe")
 --making the cargo wagon technology and unlocking the wagon parts and fluid
 
 local trainTechCargo = util.table.deepcopy(data.raw["technology"]["fluid-wagon"])
@@ -6,15 +8,10 @@ trainTechCargo.name = "trainassembly-cargo-wagon"
 trainTechCargo.localised_name = {"technology-name.trainassembly-cargo-wagon"}
 trainTechCargo.localised_description = {"technology-description.trainassembly-cargo-wagon"}
 
-trainTechCargo.icon = "__trainConstructionSite__/graphics/technology/cargo-wagon.png"
+trainTechCargo.icon = "__trainConstructionSiteFork__/graphics/technology/cargo-wagon.png"
 trainTechCargo.icon_size = 128
 
-trainTechCargo.prerequisites = {"logistics-2"}
-if settings.startup["trainController-manual-placing-trains"].value then
-  table.insert(trainTechCargo.prerequisites, "railway")
-else
-  table.insert(trainTechCargo.prerequisites, "trainassembly-automated-train-assembling")
-end
+trainTechCargo.prerequisites = {"logistics-2", "trainassembly-automated-train-assembling"}
 
 if data.raw["technology"]["railway"].prerequisites then -- replace logistics-2 from railway in logistics-1
   for prerequisitesIndex, prerequisite in pairs(data.raw["technology"]["railway"].prerequisites) do
@@ -27,7 +24,7 @@ end
 if data.raw["technology"]["railway"].effects then
   for effectIndex, effect in pairs(data.raw["technology"]["railway"].effects) do
     if effect.type == "unlock-recipe" and effect.recipe == "cargo-wagon" then
-      data.raw["technology"]["railway"].effects[effectIndex] = nil -- this removes that single unlock
+      table.remove(data.raw["technology"]["railway"].effects, effectIndex) -- this removes that single unlock
     end
   end
 end
@@ -44,7 +41,7 @@ for _, trainRecipe in pairs ({
   table.insert(trainTechCargo.effects,
   {
     type = "unlock-recipe",
-    recipe = trainRecipe .. "-fluid[" .. trainRecipe .. "]",
+    recipe = trainRecipeName.make_name(trainRecipe, trainRecipe),
   })
 end
 
@@ -58,7 +55,7 @@ trainTechArty.name = "trainassembly-artillery-wagon"
 trainTechArty.localised_name = {"technology-name.trainassembly-artillery-wagon"}
 trainTechArty.localised_description = {"technology-description.trainassembly-artillery-wagon"}
 
-trainTechArty.icon = "__trainConstructionSite__/graphics/technology/artillery-wagon_-_scaled.png"
+trainTechArty.icon = "__trainConstructionSiteFork__/graphics/technology/artillery-wagon_-_scaled.png"
 trainTechArty.icon_size = 256
 
 trainTechArty.prerequisites = {"trainassembly-cargo-wagon", "artillery"}
@@ -66,7 +63,7 @@ trainTechArty.prerequisites = {"trainassembly-cargo-wagon", "artillery"}
 if data.raw["technology"]["artillery"].effects then
   for effectIndex, effect in pairs(data.raw["technology"]["artillery"].effects) do
     if effect.type == "unlock-recipe" and effect.recipe == "artillery-wagon" then
-      data.raw["technology"]["artillery"].effects[effectIndex] = nil -- this removes that single unlock
+      table.remove(data.raw["technology"]["artillery"].effects, effectIndex) -- this removes that single unlock
     end
   end
 end
@@ -83,7 +80,7 @@ for _, trainRecipe in pairs ({
   table.insert(trainTechArty.effects,
   {
     type = "unlock-recipe",
-    recipe = trainRecipe .. "-fluid[" .. trainRecipe .. "]",
+    recipe = trainRecipeName.make_name(trainRecipe, trainRecipe),
   })
 end
 
@@ -97,7 +94,7 @@ for _, trainRecipe in pairs ({
   table.insert(data.raw["technology"]["trainassembly-automated-train-assembling"].effects,
   {
     type = "unlock-recipe",
-    recipe = trainRecipe .. "-fluid[" .. trainRecipe .. "]",
+    recipe = trainRecipeName.make_name(trainRecipe, trainRecipe),
   })
 end
 
@@ -116,7 +113,7 @@ for techName, techPrototype in pairs(data.raw["technology"]) do
             table.insert(data.raw["technology"][techName].effects, techEffectIndex + 1,
             {
               type = "unlock-recipe",
-              recipe = wagonName .. "-fluid[" .. wagonName .. "]",
+              recipe = trainRecipeName.make_name(wagonName, wagonName),
             })
           end
         end

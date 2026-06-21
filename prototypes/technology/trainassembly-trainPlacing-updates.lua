@@ -1,3 +1,6 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
+local trainRecipe = require("compat.train_recipe")
+
 local recipesToIgnore = {
   -- trainConstructionSite
   ["trainassembly"] = true,
@@ -13,15 +16,10 @@ local recipesToIgnore = {
 -- for mod compatibility we have to add these fluid recipe unlocks to the tech tree
 local trainsToIgnore = require("prototypes/modded-trains-to-ignore")
 local itemOverride   = require("prototypes/modded-trains-item-override")
-local recipeOverride   = require("prototypes/modded-trains-recipe-override")
-for _, trainType in pairs({
-  "locomotive",
-  "cargo-wagon",
-  "fluid-wagon",
-  "artillery-wagon",
-}) do
+local recipeOverride = require("prototypes/modded-trains-recipe-override")
+for _, trainType in pairs(trainRecipe.train_types) do
   -- For each type, we get all the different entities (ex: locomotive mk1, mk2, ...)
-  for _, trainEntity in pairs(data.raw[trainType]) do
+  for _, trainEntity in pairs(data.raw[trainType] or {}) do
     -- For each entity, we get the item name. The item name is stored in minable.result
     if (not trainsToIgnore[trainType][trainEntity.name]) and trainEntity.minable and trainEntity.minable.result then
 
@@ -29,7 +27,7 @@ for _, trainType in pairs({
       local recipeName = recipeOverride[trainType][itemName] or itemName -- assume the recipeName is the same as the item (otherwise we need to override it manualy)
 
       if not recipesToIgnore[recipeName] then
-        local fluidRecipeName = trainEntity.name .. "-fluid[" .. trainType .. "]"
+        local fluidRecipeName = trainRecipe.make_name(trainEntity.name, trainType)
 
         -- now search all tech, to find the recipe that unlocks the item
         local technologyUnlockAdded = false
@@ -73,7 +71,7 @@ for _, trainType in pairs({
                     end
                   end
 
-                  -- if not peresent we can add it
+                  -- if not present we can add it
                   if not prerequisitePresent then
                     table.insert(technology.prerequisites, prerequisite)
                   end
@@ -89,7 +87,7 @@ for _, trainType in pairs({
           --log(string.format("Unlocking train parts: %s (%s)", trainEntity.name, trainType))
         else
           log(string.format("Error unlocking train parts: %s (%s)", trainEntity.name, trainType))
-          data.raw.recipe[fluidRecipeName].normal.enabled = true
+          data.raw.recipe[fluidRecipeName].enabled = true
         end
 
       end

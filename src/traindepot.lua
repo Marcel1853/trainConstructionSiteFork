@@ -1,5 +1,6 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 require 'util'
-require("__LSlib__/LSlib")
+require("compat.lslib")
 
 -- Create class
 Traindepot = {}
@@ -10,28 +11,24 @@ require 'src.traindepot-gui'
 --------------------------------------------------------------------------------
 function Traindepot:onInit()
   -- Init global data; data stored through the whole map
-  if not global.TD_data then
-    global.TD_data = self:initGlobalData()
+  if not storage.TD_data then
+    storage.TD_data = self:initGlobalData()
   end
   self.Gui:onInit()
 end
 
-
-
 -- Initiation of the global data
 function Traindepot:initGlobalData()
   local TD_data = {
-    ["version"        ] = 3, -- version of the global data
-    ["prototypeData"  ] = self:initPrototypeData(), -- data storing info about the prototypes
+    ["version"] = 3,                                -- version of the global data
+    ["prototypeData"] = self:initPrototypeData(),   -- data storing info about the prototypes
 
-    ["depots"         ] = {},  -- keep track of all depots and there entity data
-    ["depotStatistics"] = {},  -- keep track of all depot names and statistics about them
+    ["depots"] = {},                                -- keep track of all depots and there entity data
+    ["depotStatistics"] = {},                       -- keep track of all depot names and statistics about them
   }
 
   return util.table.deepcopy(TD_data)
 end
-
-
 
 -- Initialisation of the prototye data inside the global data
 function Traindepot:initPrototypeData()
@@ -40,8 +37,6 @@ function Traindepot:initPrototypeData()
     ["traindepotName"] = "traindepot", -- item and entity have same name
   }
 end
-
-
 
 --------------------------------------------------------------------------------
 -- Setter functions to alter data into the data structure
@@ -58,25 +53,24 @@ function Traindepot:saveNewStructure(depotEntity)
   --         excists for the surface, if not, we make one. Afther that we also
   --         have to check if the surface table has a table we can index for
   --         the y-position, if not, we make one.
-  if not global.TD_data["depots"][depotSurfaceIndex] then
-    global.TD_data["depots"][depotSurfaceIndex] = {}
+  if not storage.TD_data["depots"][depotSurfaceIndex] then
+    storage.TD_data["depots"][depotSurfaceIndex] = {}
   end
-  if not global.TD_data["depots"][depotSurfaceIndex][depotPosition.y] then
-    global.TD_data["depots"][depotSurfaceIndex][depotPosition.y] = {}
+  if not storage.TD_data["depots"][depotSurfaceIndex][depotPosition.y] then
+    storage.TD_data["depots"][depotSurfaceIndex][depotPosition.y] = {}
   end
 
   -- STEP 1b:Now we know we can index (without crashing) to the position as:
   --         dataStructure[surfaceIndex][positionY][positionX]
   --         Now we can store our wanted data at this position
-  global.TD_data["depots"][depotSurfaceIndex][depotPosition.y][depotPosition.x] = {
+  storage.TD_data["depots"][depotSurfaceIndex][depotPosition.y][depotPosition.x] = {
     ["entity"] = depotEntity, -- the controller entity
   }
 
   -- STEP 2: Save the station name to the list of statistics
-  self:setStationAmount(depotForceName, depotSurfaceIndex, depotName, self:getDepotStationCount(depotForceName, depotSurfaceIndex, depotName) + 1)
+  self:setStationAmount(depotForceName, depotSurfaceIndex, depotName,
+    self:getDepotStationCount(depotForceName, depotSurfaceIndex, depotName) + 1)
 end
-
-
 
 function Traindepot:deleteBuilding(depotEntity)
   -- With this function we remove all the saved data about the traindepot
@@ -86,36 +80,34 @@ function Traindepot:deleteBuilding(depotEntity)
   local depotName         = depotEntity.backer_name
 
   -- STEP 1: Delete the building
-  if global.TD_data["depots"][depotSurfaceIndex][depotPosition.y][depotPosition.x] then
-    global.TD_data["depots"][depotSurfaceIndex][depotPosition.y][depotPosition.x] = nil
+  if storage.TD_data["depots"][depotSurfaceIndex][depotPosition.y][depotPosition.x] then
+    storage.TD_data["depots"][depotSurfaceIndex][depotPosition.y][depotPosition.x] = nil
 
-    if LSlib.utils.table.isEmpty(global.TD_data["depots"][depotSurfaceIndex][depotPosition.y]) then
-      global.TD_data["depots"][depotSurfaceIndex][depotPosition.y] = nil
+    if LSlib.utils.table.isEmpty(storage.TD_data["depots"][depotSurfaceIndex][depotPosition.y]) then
+      storage.TD_data["depots"][depotSurfaceIndex][depotPosition.y] = nil
 
-      if LSlib.utils.table.isEmpty(global.TD_data["depots"][depotSurfaceIndex]) then
-        global.TD_data["depots"][depotSurfaceIndex] = nil
+      if LSlib.utils.table.isEmpty(storage.TD_data["depots"][depotSurfaceIndex]) then
+        storage.TD_data["depots"][depotSurfaceIndex] = nil
       end
     end
   end
 
   -- STEP2: Update the statistics
-  self:setStationAmount(depotForceName, depotSurfaceIndex, depotName, self:getDepotStationCount(depotForceName, depotSurfaceIndex, depotName) - 1)
+  self:setStationAmount(depotForceName, depotSurfaceIndex, depotName,
+    self:getDepotStationCount(depotForceName, depotSurfaceIndex, depotName) - 1)
 
   -- STEP3: Update the UI
   self.Gui:updateOpenedGuis(depotName)
 
   local trainControllers = Traincontroller:getAllTrainControllers(depotSurfaceIndex, depotName)
-  for _,trainController in pairs(trainControllers) do
+  for _, trainController in pairs(trainControllers) do
     Traincontroller.Gui:updateOpenedGuis(trainController, false)
   end
 end
 
-
-
 function Traindepot:renameBuilding(depotEntity, oldName)
   local depotName = depotEntity.backer_name
   if oldName ~= depotName then -- checking to make sure it is actualy changed
-
     local depotForceName = depotEntity.force.name
     local depotSurfaceIndex = depotEntity.surface.index
 
@@ -132,20 +124,18 @@ function Traindepot:renameBuilding(depotEntity, oldName)
   end
 end
 
-
-
 function Traindepot:setStationAmount(depotForceName, depotSurfaceIndex, depotName, newStationAmount)
   if newStationAmount > 0 then
     -- Make sure we can index it
-    if not global.TD_data["depotStatistics"][depotForceName] then
-      global.TD_data["depotStatistics"][depotForceName] = {}
+    if not storage.TD_data["depotStatistics"][depotForceName] then
+      storage.TD_data["depotStatistics"][depotForceName] = {}
     end
-    if not global.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex] then
-      global.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex] = {}
+    if not storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex] then
+      storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex] = {}
     end
 
     -- set the new data
-    local depotData = global.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex][depotName] or {}
+    local depotData = storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex][depotName] or {}
     depotData["stationAmount"] = newStationAmount
 
     -- make sure the other data is within limits
@@ -157,23 +147,19 @@ function Traindepot:setStationAmount(depotForceName, depotSurfaceIndex, depotNam
     end
 
     -- update the data
-    global.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex][depotName] = depotData
-
+    storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex][depotName] = depotData
   else -- newStationAmount is 0, remove it
-    global.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex][depotName] = nil
+    storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex][depotName] = nil
 
-    if LSlib.utils.table.isEmpty(global.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex]) then
-      global.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex] = nil
+    if LSlib.utils.table.isEmpty(storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex]) then
+      storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex] = nil
 
-      if LSlib.utils.table.isEmpty(global.TD_data["depotStatistics"][depotForceName]) then
-        global.TD_data["depotStatistics"][depotForceName] = nil
+      if LSlib.utils.table.isEmpty(storage.TD_data["depotStatistics"][depotForceName]) then
+        storage.TD_data["depotStatistics"][depotForceName] = nil
       end
     end
-
   end
 end
-
-
 
 function Traindepot:setDepotRequestCount(depotForceName, depotSurfaceIndex, depotName, newStationRequestAmount)
   local depotData = self:getDepotData(depotForceName, depotSurfaceIndex)[depotName]
@@ -188,92 +174,71 @@ function Traindepot:setDepotRequestCount(depotForceName, depotSurfaceIndex, depo
   end
 
   -- update the data
-  global.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex][depotName] = depotData
+  storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex][depotName] = depotData
 end
-
-
 
 function Traindepot:setTrainstopControlBehaviour(trainStopEntity)
   local stationBehaviour = trainStopEntity.get_or_create_control_behavior()
 
-  stationBehaviour.enable_disable = false              -- circuit network
+  stationBehaviour.circuit_enable_disable = false      -- circuit network
   stationBehaviour.connect_to_logistic_network = false -- logistic network
-
 end
-
-
 
 --------------------------------------------------------------------------------
 -- Getter functions to extract data from the data structure
 --------------------------------------------------------------------------------
 function Traindepot:getDepotEntityName()
-  return global.TD_data["prototypeData"]["traindepotName"]
+  return storage.TD_data["prototypeData"]["traindepotName"]
 end
-
-
 
 function Traindepot:getDepotItemName()
-  return global.TD_data["prototypeData"]["traindepotName"]
+  return storage.TD_data["prototypeData"]["traindepotName"]
 end
-
-
 
 function Traindepot:hasDepotEntities(depotForceName, depotSurfaceIndex)
   -- returns true if at least one depot has been build on the force on that surface
-  if global.TD_data["depotStatistics"][depotForceName]                    and
-     global.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex] then
-    return not LSlib.utils.table.isEmpty(global.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex])
+  if storage.TD_data["depotStatistics"][depotForceName] and
+      storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex] then
+    return not LSlib.utils.table.isEmpty(storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex])
   end
   return false
 end
 
-
-
 function Traindepot:getDepotEntity(depotSurfaceIndex, depotPosition)
-  if global.TD_data["depots"][depotSurfaceIndex]                                   and
-     global.TD_data["depots"][depotSurfaceIndex][depotPosition.y]                  and
-     global.TD_data["depots"][depotSurfaceIndex][depotPosition.y][depotPosition.x] then
-    return global.TD_data["depots"][depotSurfaceIndex][depotPosition.y][depotPosition.x]["entity"]
+  if storage.TD_data["depots"][depotSurfaceIndex] and
+      storage.TD_data["depots"][depotSurfaceIndex][depotPosition.y] and
+      storage.TD_data["depots"][depotSurfaceIndex][depotPosition.y][depotPosition.x] then
+    return storage.TD_data["depots"][depotSurfaceIndex][depotPosition.y][depotPosition.x]["entity"]
   else
     return nil
   end
 end
 
-
-
 function Traindepot:getDepotData(depotForceName, depotSurfaceIndex)
   if self:hasDepotEntities(depotForceName, depotSurfaceIndex) then
-    return global.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex]
+    return storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex]
   else
     return {}
   end
 end
 
-
-
 function Traindepot:getDepotStationCount(depotForceName, depotSurfaceIndex, depotName)
   return (self:getDepotData(depotForceName, depotSurfaceIndex)[depotName] or {})["stationAmount"] or 0
 end
-
-
 
 function Traindepot:getDepotRequestCount(depotForceName, depotSurfaceIndex, depotName)
   return (self:getDepotData(depotForceName, depotSurfaceIndex)[depotName] or {})["requestAmount"] or 0
 end
 
-
-
 function Traindepot:getAllTrainsPathingToDepot(depotSurfaceIndex, depotName)
   -- index all depots on this surface, we need to find one depot with the given name
-  if not global.TD_data["depots"][depotSurfaceIndex] then return nil end
-  for depotPositionY,depotPositionList in pairs(global.TD_data["depots"][depotSurfaceIndex]) do
-    for depotPositionX,depotEntityData in pairs(depotPositionList) do
-
+  if not storage.TD_data["depots"][depotSurfaceIndex] then return nil end
+  for depotPositionY, depotPositionList in pairs(storage.TD_data["depots"][depotSurfaceIndex]) do
+    for depotPositionX, depotEntityData in pairs(depotPositionList) do
       -- check if a depot has the correct name
       if depotEntityData.entity.valid and depotEntityData.entity.backer_name == depotName then
         return depotEntityData.entity.get_train_stop_trains()
       end
-
     end
   end
 
@@ -281,14 +246,13 @@ function Traindepot:getAllTrainsPathingToDepot(depotSurfaceIndex, depotName)
   return nil
 end
 
-
 function Traindepot:getNumberOfTrainsPathingToDepot(depotSurfaceIndex, depotName)
   -- obtain a list with all the trains
   local depotTrains = self:getAllTrainsPathingToDepot(depotSurfaceIndex, depotName) or {}
 
   -- check schedule of each train
   local trainAmountPathingToDepot = 0
-  for _,trainWithDepotSchedule in pairs(depotTrains) do
+  for _, trainWithDepotSchedule in pairs(depotTrains) do
     local trainSchedule = trainWithDepotSchedule.schedule
     local currentActiveSchedule = trainSchedule.records[trainSchedule.current]
     if currentActiveSchedule.station == depotName then
@@ -299,13 +263,11 @@ function Traindepot:getNumberOfTrainsPathingToDepot(depotSurfaceIndex, depotName
   return trainAmountPathingToDepot
 end
 
-
-
 function Traindepot:getNumberOfTrainsStoppedInDepot(depotSurfaceIndex, depotName)
   -- returns amount of stations that are currently occupied
   local amount = 0
-  for depotPositionY,depotPositionList in pairs(global.TD_data["depots"][depotSurfaceIndex]) do
-    for depotPositionX,depotEntityData in pairs(depotPositionList) do
+  for depotPositionY, depotPositionList in pairs(storage.TD_data["depots"][depotSurfaceIndex]) do
+    for depotPositionX, depotEntityData in pairs(depotPositionList) do
       local depotEntity = depotEntityData.entity
       if depotEntity.valid and depotEntity.backer_name == depotName and depotEntity.get_stopped_train() then
         amount = amount + 1
@@ -315,14 +277,10 @@ function Traindepot:getNumberOfTrainsStoppedInDepot(depotSurfaceIndex, depotName
   return amount
 end
 
-
-
 function Traindepot:getTrainBuilderCount(depotForceName, depotSurfaceIndex, depotName)
   local controllerForceName = Traincontroller:getControllerForceName(depotForceName)
   return Traincontroller:getTrainBuilderCount(controllerForceName, depotSurfaceIndex, depotName)
 end
-
-
 
 --------------------------------------------------------------------------------
 -- Behaviour functions, mostly event handlers
@@ -335,10 +293,11 @@ function Traindepot:onBuildEntity(createdEntity)
 
     -- after structure is saved, we rename it, this will trigger Traindepot:onRenameEntity as well
     createdEntity.backer_name = "Unused Traindepot"
+    if Traincontroller and Traincontroller.processPendingControllers then
+      Traincontroller:processPendingControllers()
+    end
   end
 end
-
-
 
 -- When a player/robot removes the building
 function Traindepot:onRemoveEntity(removedEntity)
@@ -347,16 +306,12 @@ function Traindepot:onRemoveEntity(removedEntity)
   end
 end
 
-
-
 -- When a player/script renames an entity
 function Traindepot:onRenameEntity(renamedEntity, oldName)
   if renamedEntity.name == self:getDepotEntityName() and self:getDepotEntity(renamedEntity.surface.index, renamedEntity.position) then
     self:renameBuilding(renamedEntity, oldName)
   end
 end
-
-
 
 function Traindepot:onPlayerChangedSettings(pastedEntity)
   if pastedEntity.name == self:getDepotEntityName() then

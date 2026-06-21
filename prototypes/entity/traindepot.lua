@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 
 local traindepot = util.table.deepcopy(data.raw["train-stop"]["train-stop"])
 
@@ -11,7 +12,7 @@ traindepot.localised_description = util.table.deepcopy(data.raw["item"][traindep
 traindepot.icon = util.table.deepcopy(data.raw["item"][traindepot.minable.result].icon)
 traindepot.icon_size = util.table.deepcopy(data.raw["item"][traindepot.minable.result].icon_size)
 traindepot.icons = util.table.deepcopy(data.raw["item"][traindepot.minable.result].icons)
-traindepot.icon_mipmaps = util.table.deepcopy(data.raw["item"][traindepot.minable.result].icon_mipmaps)
+traindepot.icon_mipmaps = nil
 
 traindepot.rail_overlay_animations = {
   filename = "__core__/graphics/empty.png",
@@ -22,7 +23,7 @@ traindepot.rail_overlay_animations = {
 traindepot.animations = {
   north =
   {
-    filename = "__trainConstructionSite__/graphics/entity/traindepot/traindepot-N-bottom.png",
+    filename = "__trainConstructionSiteFork__/graphics/entity/traindepot/traindepot-N-bottom.png",
     priority = "high",
     width = 384,
     height = 384,
@@ -34,7 +35,7 @@ traindepot.animations = {
   },
   east =
   {
-    filename = "__trainConstructionSite__/graphics/entity/traindepot/traindepot-E-bottom.png",
+    filename = "__trainConstructionSiteFork__/graphics/entity/traindepot/traindepot-E-bottom.png",
     priority = "high",
     width = 384,
     height = 384,
@@ -46,7 +47,7 @@ traindepot.animations = {
   },
   south =
   {
-    filename = "__trainConstructionSite__/graphics/entity/traindepot/traindepot-S-bottom.png",
+    filename = "__trainConstructionSiteFork__/graphics/entity/traindepot/traindepot-S-bottom.png",
     priority = "high",
     width = 384,
     height = 384,
@@ -58,7 +59,7 @@ traindepot.animations = {
   },
   west =
   {
-    filename = "__trainConstructionSite__/graphics/entity/traindepot/traindepot-W-bottom.png",
+    filename = "__trainConstructionSiteFork__/graphics/entity/traindepot/traindepot-W-bottom.png",
     priority = "high",
     width = 384,
     height = 384,
@@ -72,7 +73,7 @@ traindepot.animations = {
 traindepot.top_animations = {
   north =
   {
-    filename = "__trainConstructionSite__/graphics/entity/traindepot/traindepot-N-top.png",
+    filename = "__trainConstructionSiteFork__/graphics/entity/traindepot/traindepot-N-top.png",
     priority = "high",
     width = 384,
     height = 384,
@@ -84,7 +85,7 @@ traindepot.top_animations = {
   },
   east =
   {
-    filename = "__trainConstructionSite__/graphics/entity/traindepot/traindepot-E-top.png",
+    filename = "__trainConstructionSiteFork__/graphics/entity/traindepot/traindepot-E-top.png",
     priority = "high",
     width = 384,
     height = 384,
@@ -96,7 +97,7 @@ traindepot.top_animations = {
   },
   south =
   {
-    filename = "__trainConstructionSite__/graphics/entity/traindepot/traindepot-S-top.png",
+    filename = "__trainConstructionSiteFork__/graphics/entity/traindepot/traindepot-S-top.png",
     priority = "high",
     width = 384,
     height = 384,
@@ -108,7 +109,7 @@ traindepot.top_animations = {
   },
   west =
   {
-    filename = "__trainConstructionSite__/graphics/entity/traindepot/traindepot-W-top.png",
+    filename = "__trainConstructionSiteFork__/graphics/entity/traindepot/traindepot-W-top.png",
     priority = "high",
     width = 384,
     height = 384,
@@ -157,7 +158,7 @@ traindepot.light2 = {
 traindepot.circuit_wire_max_distance = 0
 
 
-table.insert(traindepot.flags, "not-blueprintable")
+-- Blueprinting is supported by runtime validation/pending activation in 0.4.1.
 
 data:extend{
   traindepot,

@@ -1,10 +1,11 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 
 --Maingroup for all the subgroups involved in trains
 local transportLogistics = util.table.deepcopy(data.raw["item-group"]["logistics"])
 transportLogistics.name = "transport-logistics"
 transportLogistics.localised_name = {"item-group-name.transportLogistics"}
 transportLogistics.order = transportLogistics.order .. "a[transport]"
-transportLogistics.icon = "__trainConstructionSite__/graphics/technology/traincontroller.png"
+transportLogistics.icon = "__trainConstructionSiteFork__/graphics/technology/traincontroller.png"
 transportLogistics.icon_size = 128
 
 --Rails, assembler, trainstop, depo, railsignal and chainsignal.
@@ -45,8 +46,12 @@ for _, vehicleName in pairs{
   end
 end
 
-data.raw["spidertron-remote"]["spidertron-remote"].subgroup = "manual-buildable-vehicles"
-data.raw["spidertron-remote"]["spidertron-remote"].order = "b-"..data.raw["spidertron-remote"]["spidertron-remote"].order
+local spidertronRemote = (data.raw["rts-tool"] and data.raw["rts-tool"]["spidertron-remote"]) or
+                        (data.raw["spidertron-remote"] and data.raw["spidertron-remote"]["spidertron-remote"])
+if spidertronRemote then
+  spidertronRemote.subgroup = "manual-buildable-vehicles"
+  spidertronRemote.order = "b-"..(spidertronRemote.order or "z")
+end
 
 
 

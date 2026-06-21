@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 
 local trainTechBuilder = util.table.deepcopy(data.raw["technology"]["railway"])
 
@@ -6,13 +7,13 @@ trainTechBuilder.name = "trainassembly-automated-train-assembling"
 trainTechBuilder.localised_name = {"technology-name.trainTechBuilder"}
 trainTechBuilder.localised_description = {"technology-description.trainTechBuilder"}
 
-trainTechBuilder.icon = "__trainConstructionSite__/graphics/technology/trainassembly.png"
+trainTechBuilder.icon = "__trainConstructionSiteFork__/graphics/technology/trainassembly.png"
 trainTechBuilder.icon_size = 128
 trainTechBuilder.icons = nil
-trainTechBuilder.icon_mipmaps = 1
+trainTechBuilder.icon_mipmaps = nil
 
 trainTechBuilder.effects = {}
-trainTechBuilder.prerequisites = {"rail-signals", --[["logistics-2",]] "automation-2",}
+trainTechBuilder.prerequisites = {"railway", --[["logistics-2",]] "automation-2",}
 
 
 

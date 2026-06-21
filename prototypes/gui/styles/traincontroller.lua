@@ -1,7 +1,7 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 
 -- default styles --------------------------------------------------------------
-LSlib.styles.addTabStyle(LSlib.styles.getVanillaTabStyleSpecification())
-LSlib.styles.addFillerFrameStyles()
+require "prototypes.gui.styles.defaults"
 local guiStyles = data.raw["gui-style"]["default"]
 
 -- traincontroller custom styles -----------------------------------------------
@@ -47,9 +47,26 @@ guiStyles["traincontroller_configuration_scrollpane"] = {
   horizontally_stretchable = "on",
 }
 
+guiStyles["traincontroller_configuration_row_flow"] = {
+  type = "horizontal_flow_style",
+  parent = "horizontal_flow",
+  horizontal_spacing = 4,
+  vertical_spacing = 0,
+  left_padding = 0,
+  right_padding = 0,
+  top_padding = 0,
+  bottom_padding = 0,
+}
+
 guiStyles["traincontroller_configuration_flow"] = {
-  type = "vertical_flow_style"   ,
-  parent = "traindepot_controller_minimap_flow",
+  type = "vertical_flow_style",
+  parent = "vertical_flow",
+  horizontal_spacing = 0,
+  vertical_spacing = 4,
+  left_padding = 0,
+  right_padding = 0,
+  top_padding = 0,
+  bottom_padding = 0,
 }
 
 -- Color picker custom styles --------------------------------------------------
@@ -57,8 +74,8 @@ guiStyles["traincontroller_color_picker_entity_preview"] = {
   type = "empty_widget_style",
   parent = "empty_widget",
 
-  minimal_width  = guiStyles["entity_button_base"].size,
-  minimal_height = guiStyles["entity_button_base"].size,
+  minimal_width  = 220,
+  minimal_height = 92,
 
   horizontally_stretchable = "on",
   vertically_stretchable = "on",

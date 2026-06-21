@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 
 local trainsToIgnore = require("prototypes/modded-trains-to-ignore")
 local itemOverride   = require("prototypes/modded-trains-item-override")
@@ -23,7 +24,7 @@ for _,trainType in pairs({
         local item_icons = {
           {
             icon      = "__base__/graphics/icons/wooden-chest.png",
-            --icon      = "__trainConstructionSite__/graphics/item/trainparts/trainparts-chest.png",
+            --icon      = "__trainConstructionSiteFork__/graphics/item/trainparts/trainparts-chest.png",
             icon_size = 64,
             tint      = {r = 0.75, g = 0.75, b = 0.75}
           }

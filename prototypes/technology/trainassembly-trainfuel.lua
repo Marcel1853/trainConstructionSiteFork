@@ -1,3 +1,13 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
+local function makeScienceUnit(sourceTechnologyName, count, time)
+  local sourceTechnology = data.raw["technology"][sourceTechnologyName] or data.raw["technology"]["railway"]
+  local sourceUnit = sourceTechnology and sourceTechnology.unit or data.raw["technology"]["railway"].unit
+  return {
+    count = count,
+    ingredients = util.table.deepcopy(sourceUnit.ingredients),
+    time = time,
+  }
+end
 
 for _, recipeName in pairs{
   "trainassembly-trainfuel-wood",
@@ -29,12 +39,7 @@ data:extend{ -- add fuel recipe to tech tree
     {
       "trainassembly-automated-train-assembling",
     },
-    unit =
-    {
-      count = 75,
-      ingredients = util.table.deepcopy(data.raw["technology"]["railway"].unit.ingredients),
-      time = 10,
-    },
+    unit = makeScienceUnit("railway", 75, 10),
     order = "c-g-a-b",
   },
   {
@@ -55,12 +60,7 @@ data:extend{ -- add fuel recipe to tech tree
       "trainfuel-2",
       "oil-processing",
     },
-    unit =
-    {
-      count = 100,
-      ingredients = util.table.deepcopy(data.raw["technology"]["oil-processing"].unit.ingredients),
-      time = 10,
-    },
+    unit = makeScienceUnit("oil-processing", 100, 10),
     order = "c-g-a-c",
   },
   {
@@ -81,13 +81,7 @@ data:extend{ -- add fuel recipe to tech tree
       "trainfuel-3",
       "rocket-fuel",
     },
-    unit =
-    {
-      count = 75,
-      ingredients = util.table.deepcopy(data.raw["technology"]["rocket-fuel"].unit.ingredients),
-
-      time = 30,
-    },
+    unit = makeScienceUnit("rocket-fuel", 75, 30),
     order = "c-g-a-d",
   },
   {
@@ -108,12 +102,7 @@ data:extend{ -- add fuel recipe to tech tree
       "trainfuel-4",
       "kovarex-enrichment-process",
     },
-    unit =
-    {
-      count = 500,
-      ingredients = util.table.deepcopy(data.raw["technology"]["kovarex-enrichment-process"].unit.ingredients),
-      time = 60,
-    },
+    unit = makeScienceUnit("kovarex-enrichment-process", 500, 60),
     order = "c-g-a-e",
   },
 }
@@ -121,11 +110,11 @@ data:extend{ -- add fuel recipe to tech tree
 -- update the icons
 for level = 2, 5 do
   for _,iconLayer in pairs(data.raw["technology"][string.format("trainfuel-%i", level)].icons) do
-    if iconLayer.icon == "__trainConstructionSite__/graphics/item/trainfuel/loco/loco-64.png" then
-      iconLayer.icon      = "__trainConstructionSite__/graphics/item/trainfuel/loco/loco-128.png"
+    if iconLayer.icon == "__trainConstructionSiteFork__/graphics/item/trainfuel/loco/loco-64.png" then
+      iconLayer.icon      = "__trainConstructionSiteFork__/graphics/item/trainfuel/loco/loco-128.png"
       iconLayer.icon_size = 128
-    elseif iconLayer.icon == "__trainConstructionSite__/graphics/item/trainfuel/fuel-handle/fuel-handle-32.png" then
-      iconLayer.icon      = "__trainConstructionSite__/graphics/item/trainfuel/fuel-handle/fuel-handle-64.png"
+    elseif iconLayer.icon == "__trainConstructionSiteFork__/graphics/item/trainfuel/fuel-handle/fuel-handle-32.png" then
+      iconLayer.icon      = "__trainConstructionSiteFork__/graphics/item/trainfuel/fuel-handle/fuel-handle-64.png"
       iconLayer.icon_size = 64
     end
     for shiftAxis,shiftAmount in pairs(iconLayer.shift or {}) do

@@ -1,3 +1,32 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
+-- TCS compatibility safety wrappers -------------------------------------------------
+-- Many entries in this file target old optional mods. Factorio 2.0 forks may rename
+-- or remove prototypes. These wrappers make missing optional prototypes a skip instead
+-- of a data-stage crash.
+local function prototype_exists(type_name, prototype_name)
+  return data.raw[type_name] and data.raw[type_name][prototype_name]
+end
+
+local function subgroup_exists(subgroup_name)
+  return data.raw["item-subgroup"] and data.raw["item-subgroup"][subgroup_name]
+end
+
+local _TCS_LSlib_item_setSubgroup = LSlib.item.setSubgroup
+LSlib.item.setSubgroup = function(type_name, prototype_name, subgroup_name)
+  if prototype_exists(type_name, prototype_name) and subgroup_exists(subgroup_name) then
+    local ok, err = pcall(_TCS_LSlib_item_setSubgroup, type_name, prototype_name, subgroup_name)
+    if not ok then log("[TCS compatibility] Skipping item subgroup update for " .. tostring(type_name) .. "/" .. tostring(prototype_name) .. ": " .. tostring(err)) end
+  end
+end
+
+local _TCS_LSlib_item_setOrderstring = LSlib.item.setOrderstring
+LSlib.item.setOrderstring = function(type_name, prototype_name, order_string)
+  if prototype_exists(type_name, prototype_name) then
+    local ok, err = pcall(_TCS_LSlib_item_setOrderstring, type_name, prototype_name, order_string)
+    if not ok then log("[TCS compatibility] Skipping item order update for " .. tostring(type_name) .. "/" .. tostring(prototype_name) .. ": " .. tostring(err)) end
+  end
+end
+
 -- Other mod items related to trains to be sorted
 require "prototypes/modded-updates-trainfuel"
 local otherVehicleGroup = "manual-buildable-vehicles"
@@ -118,20 +147,24 @@ if mods["laser_tanks"] then
   LSlib.item.setOrderstring("item-with-entity-data", "lasertank", "b-bd")
 end
 
-if mods["Transport_Drones"] then
+if mods["Transport_Drones"] and subgroup_exists("transport-drones") then
   data.raw["item-subgroup"]["transport-drones"].group = "transport-logistics"
   data.raw["item-subgroup"]["transport-drones"].order = "aa"
 end
 
 if mods["aai-programmable-vehicles"] then
-  data.raw["item-subgroup"]["programmable-structures"].group = "transport-logistics"
-  data.raw["item-subgroup"]["programmable-structures"].order = "ab"
-
-  data.raw["item-subgroup"]["ai-vehicles"].group = "transport-logistics"
-  data.raw["item-subgroup"]["ai-vehicles"].order = "cc-a"
-
-  data.raw["item-subgroup"]["ai-vehicles-reverse"].group = "transport-logistics"
-  data.raw["item-subgroup"]["ai-vehicles-reverse"].order = "cc-b"
+  if subgroup_exists("programmable-structures") then
+    data.raw["item-subgroup"]["programmable-structures"].group = "transport-logistics"
+    data.raw["item-subgroup"]["programmable-structures"].order = "ab"
+  end
+  if subgroup_exists("ai-vehicles") then
+    data.raw["item-subgroup"]["ai-vehicles"].group = "transport-logistics"
+    data.raw["item-subgroup"]["ai-vehicles"].order = "cc-a"
+  end
+  if subgroup_exists("ai-vehicles-reverse") then
+    data.raw["item-subgroup"]["ai-vehicles-reverse"].group = "transport-logistics"
+    data.raw["item-subgroup"]["ai-vehicles-reverse"].order = "cc-b"
+  end
 end
 
 if mods["Cannon_Spidertron"] then
@@ -140,7 +173,7 @@ if mods["Cannon_Spidertron"] then
     LSlib.item.getOrderstring("item-with-entity-data", "cannon-spidertron") or "z[error]"))
 end
 
-if mods["JunkTrain3"] then
+if mods["JunkTrain3"] and data.raw["item-subgroup"] and data.raw["item-subgroup"]["transport"] then
   local transportRailway = util.table.deepcopy(data.raw["item-subgroup"]["transport"])
   transportRailway.name = "TCS-JunkTrain"
   transportRailway.group = "transport-logistics"
@@ -182,8 +215,8 @@ if mods["fast_trans"] then
     if item then
       item.localised_name = {"item-name.trainparts", {"item-name."..itemName}}
       item.localised_description = {"item-description.trainparts", {"", string.format("[img=item/%s] ", itemName.."-trainConstructionSiteDummy"), {"item-name."..itemName}}}
-      data.raw.recipe[itemName].localised_name = item.localised_name
-      data.raw.fluid[itemName.."-fluid"].localised_name = {"item-name."..itemName}
+      if data.raw.recipe[itemName] then data.raw.recipe[itemName].localised_name = item.localised_name end
+      if data.raw.fluid[itemName.."-fluid"] then data.raw.fluid[itemName.."-fluid"].localised_name = {"item-name."..itemName} end
     end
   end
 end

@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 
 local locomotiveManualBuild = util.table.deepcopy(data.raw["item-with-entity-data"]["locomotive"])
 
@@ -47,7 +48,7 @@ for _, trainType in pairs{
         local itemDummy = util.table.deepcopy(item)
         itemDummy.name = itemDummy.name.."-trainConstructionSiteDummy"
         itemDummy.flags = itemDummy.flags or {}
-        table.insert(itemDummy.flags, "hidden")
+        itemDummy.hidden = true
         data:extend{itemDummy}
         
         item.localised_name        = (item.localised_name and {"item-name.trainparts", item.localised_name}) or (trainEntity.localised_name and {"item-name.trainparts", trainEntity.localised_name}) or {"item-name.trainparts", "__ENTITY__"..trainEntity.name.."__"}
@@ -55,7 +56,7 @@ for _, trainType in pairs{
 
         -- Add item to remove the place_result.
         if not itemPlaceResult[item.type] then itemPlaceResult[item.type] = {} end
-        itemPlaceResult[item.type][item.name] = (settings.startup["trainController-manual-placing-trains"].value == false)
+        itemPlaceResult[item.type][item.name] = false -- runtime setting enforces manual placement
 
         trainEntity.fast_upgrade_group = nil
         trainEntity.next_upgrade = nil
@@ -77,8 +78,6 @@ for itemType, itemNames in pairs(itemPlaceResult) do
   end
 end
 
-if settings.startup["trainController-manual-placing-trains"].value == false then
-  data:extend{
-    locomotiveManualBuild,
-  }
-end
+-- Do not add a manual-build exception when manual train placement is disabled.
+-- If trainController-manual-placing-trains is enabled, the original train items
+-- keep their place_result and can be placed manually as usual.

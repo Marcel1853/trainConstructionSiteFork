@@ -1,0 +1,8 @@
+{
+  "recipe": [
+    ["locomotive-fluid[locomotive]", "locomotive-fluid-locomotive"],
+    ["cargo-wagon-fluid[cargo-wagon]", "cargo-wagon-fluid-cargo-wagon"],
+    ["fluid-wagon-fluid[fluid-wagon]", "fluid-wagon-fluid-fluid-wagon"],
+    ["artillery-wagon-fluid[artillery-wagon]", "artillery-wagon-fluid-artillery-wagon"]
+  ]
+}

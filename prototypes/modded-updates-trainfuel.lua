@@ -1,4 +1,5 @@
-require("__LSlib__/LSlib")
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
+require("compat.lslib")
 
 local function createRecipeIcons(itemPrototypeName)
   local recipeIcons = util.table.deepcopy(LSlib.item.getIcons("item", "trainassembly-recipefuel"))
@@ -6,7 +7,9 @@ local function createRecipeIcons(itemPrototypeName)
   recipeIcons[2].scale = 1.2
   local recipeIconsLength = #recipeIcons -- number of layers to offset the existing layers
 
-  local extraScale = recipeIcons[1].icon_size / LSlib.item.getIconSize("item", itemPrototypeName)[1]
+  local baseIconSize = recipeIcons[1].icon_size or 64
+  local itemIconSize = (LSlib.item.getIconSize("item", itemPrototypeName) or {})[1] or 64
+  local extraScale = baseIconSize / itemIconSize
   for layerIndex,layerData in pairs(LSlib.item.getIcons("item", itemPrototypeName, 0.4 * extraScale, {-20, 19})) do
     recipeIcons[recipeIconsLength + layerIndex] = layerData -- add layer to recipelayer
   end
@@ -15,6 +18,14 @@ end
 
 if mods["aai-industry"] and type(aai_processed_fuel_ignore) == "table" then
   table.insert(aai_processed_fuel_ignore, "trainassembly-trainfuel")
+end
+
+local function technology_unit_or_railway(technologyName)
+  local technology = data.raw.technology[technologyName]
+  if technology and technology.unit then
+    return util.table.deepcopy(technology.unit)
+  end
+  return util.table.deepcopy(data.raw.technology["railway"].unit)
 end
 
 -- We want to create different fuel recipes to create the fuel to initialy fuel the train.
@@ -33,6 +44,9 @@ for fuelOrder, fuelIngredient in pairs{
   mods["angelspetrochem"    ] and {"pellet-coke", 65, "angels-coal-cracking"} or nil,
 } do
 
+  if not (fuelIngredient and data.raw.item[fuelIngredient[1]]) then
+    log("[TCS compatibility] Skipping train fuel recipe for missing item " .. tostring(fuelIngredient and fuelIngredient[1]))
+  else
   -- For this item we create a fuel recipe & technology to unlock it
   data:extend{
     {
@@ -44,20 +58,16 @@ for fuelOrder, fuelIngredient in pairs{
       icon_size = nil, -- becose icons is present, no icon_size required
 
       category = "advanced-crafting",
-      normal =
+      enabled = false,
+      energy_required = 5,
+      ingredients =
       {
-        enabled = false,
-        energy_required = 5,
-        ingredients =
-        {
-          {name = fuelIngredient[1], amount = ((fuelIngredient[2] > 1) and (fuelIngredient[2]) or 1)},
-        },
-        results =
-        {
-          {name = "trainassembly-recipefuel", amount = ((fuelIngredient[2] < 1) and (1/fuelIngredient[2]) or 1)},
-        },
+        {type = "item", name = fuelIngredient[1], amount = ((fuelIngredient[2] > 1) and (fuelIngredient[2]) or 1)},
       },
-      expensive = nil, -- same as normal
+      results =
+      {
+        {type = "item", name = "trainassembly-recipefuel", amount = ((fuelIngredient[2] < 1) and (1/fuelIngredient[2]) or 1)},
+      },
 
       -- We have to add a order string to the recipe becose we have multiple
       -- recipes resulting in the same item.
@@ -82,17 +92,13 @@ for fuelOrder, fuelIngredient in pairs{
       {
         "trainassembly-automated-train-assembling",
       },
-      unit =
-      {
-        count = 75,
-        ingredients = util.table.deepcopy(data.raw["technology"]["railway"].unit.ingredients),
-        time = 10,
-      },
+      unit = technology_unit_or_railway("railway"),
       order = "c-g-a-b",
     },
   }
-  LSlib.technology.addPrerequisite("trainfuel-"..fuelIngredient[1], fuelIngredient[3])
-  data.raw.technology["trainfuel-"..fuelIngredient[1]].unit = data.raw.technology[fuelIngredient[3]].unit or
-        (data.raw.technology[fuelIngredient[3]].normal    and data.raw.technology[fuelIngredient[3]].normal.unit) or
-        (data.raw.technology[fuelIngredient[3]].expensive and data.raw.technology[fuelIngredient[3]].expensive.unit)
+  if data.raw.technology[fuelIngredient[3]] then
+    LSlib.technology.addPrerequisite("trainfuel-"..fuelIngredient[1], fuelIngredient[3])
+    data.raw.technology["trainfuel-"..fuelIngredient[1]].unit = technology_unit_or_railway(fuelIngredient[3])
+  end
+  end
 end

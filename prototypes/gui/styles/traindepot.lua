@@ -1,6 +1,7 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 
 -- default styles --------------------------------------------------------------
-LSlib.styles.addTabStyle(LSlib.styles.getVanillaTabStyleSpecification())
+require "prototypes.gui.styles.defaults"
 local guiStyles = data.raw["gui-style"]["default"]
 
 -- traindepot custom styles ----------------------------------------------------

@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 require 'util'
 require "src.traindepot"
 require "src.trainassembly"
@@ -14,7 +15,7 @@ function Debug:onInit()
 
   local surface = game.surfaces["nauvis"]
   surface.always_day = true
-  if game.active_mods["The_Lab_tiles"] then
+  if script.active_mods["The_Lab_tiles"] then
     -- Let's create lab tiles
     local labTiles = {}
     for X = -size/2,size/2 do
@@ -157,7 +158,7 @@ function Debug:createTestbench1(surface, areaRange)
       name        = Trainassembly:getMachineEntityName(),
       position    = position,
       limit       = 1,
-    }[1].set_recipe("locomotive-fluid[locomotive]")
+    }[1].set_recipe("locomotive-fluid-locomotive")
   end
 
   -- Step 2d:create the traincontrollers
@@ -232,7 +233,7 @@ function Debug:createTestbench2(surface, areaRange)
         name        = Trainassembly:getMachineEntityName(),
         position    = position,
         limit       = 1,
-      }[1].set_recipe("locomotive-fluid[locomotive]")
+      }[1].set_recipe("locomotive-fluid-locomotive")
     end
   end
 

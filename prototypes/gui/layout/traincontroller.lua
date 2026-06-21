@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 
 local guiLayout = LSlib.gui.layout.create("screen")
 
@@ -28,7 +29,7 @@ LSlib.gui.layout.addEmptyWidget(guiLayout, guiFrameHeaderFlow, "traincontroller-
 --  style = "LSlib_default_header_button",
 --})
 LSlib.gui.layout.addSpriteButton(guiLayout, guiFrameHeaderFlow, "traincontroller-close", {
-  sprite = "utility/close_white"      ,
+  sprite = "utility/close"      ,
   style = "LSlib_default_header_button",
 })
 
@@ -106,7 +107,7 @@ LSlib.gui.layout.addLabel(guiLayout, stationIDflow, "statistics-station-id-value
   ignored_by_interaction = true,
 })
 LSlib.gui.layout.addSpriteButton(guiLayout, stationIDflow, "statistics-station-id-edit", {
-  sprite = "utility/rename_icon_small_black",
+  sprite = "utility/rename_icon",
   style = "mini_button",
 })
 
@@ -142,7 +143,7 @@ local controllerFlow = LSlib.gui.layout.addScrollPane(guiLayout, guiTabContent1,
   style = "traincontroller_configuration_scrollpane",
 })
 controllerFlow = LSlib.gui.layout.addFlow(guiLayout, controllerFlow, "statistics-builder-configuration-flow", "horizontal", {
-  style = "research_queue_first_slot_flow", -- no padding
+  style = "traincontroller_configuration_row_flow", -- no padding
 })
 
 

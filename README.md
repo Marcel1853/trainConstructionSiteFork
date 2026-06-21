@@ -1,3 +1,8 @@
+# Train Construction Site Fork - Factorio 2.0 Update
+
+> This is the Factorio 2.0 fork/update of Train Construction Site.
+> Original authors: Lovely_santa and Voske_123. Factorio 2.0 update and maintenance by Marcel171297.
+
 # 1. Introduction
 Dear player,
 
@@ -15,7 +20,7 @@ You can find this information by opening the ingame manual as well.
 If you find any bugs or find anything unclear, feel free to contact us on the mod portal, in the discussion section or make a bug report on github.
 
 Kind regards and have fun playing,
-Lovely_santa and Voske_123
+Lovely_santa, Voske_123 and Marcel171297
 
 # 2. Traindepot
 ## 2.1 Usability
@@ -92,4 +97,54 @@ Instead of having to go around and rotate your Trainbuilder entities manualy, yo
 ### Future development
 This mod is still in development, changes may occur and bugs will be fixed.
 ### Latest release
-See [ingame changelog](https://mods.factorio.com/mod/trainConstructionSite/changelog) or find it [here on github](https://github.com/voske123/FactorioMod-trainConstructionSite/blob/master/changelog.txt).
+See [ingame changelog](https://mods.factorio.com/mod/trainConstructionSiteFork/changelog) or find it [here on github](https://github.com/voske123/FactorioMod-trainConstructionSite/blob/master/changelog.txt).
+
+
+# 6. Factorio 2.0 update
+
+This fork has been updated and maintained for Factorio 2.0.
+
+- Visible mod title: **Train Construction Site Fork - Factorio 2.0 Update**
+- Original authors: **Lovely_santa** and **Voske_123**
+- Factorio 2.0 update and maintenance: **Marcel171297**
+- Internal fork mod name: `trainConstructionSiteFork`. It conflicts with the original `trainConstructionSite` mod and should not be enabled at the same time.
+
+The port includes Factorio 2.0 API fixes, German localisation, GUI/runtime compatibility fixes, and performance/safety improvements around train dispatching.
+
+
+## Settings
+
+- **Allow manual placing of trains**: disabled by default. This is a runtime-global setting; changing it in an existing save takes effect immediately. When disabled, rolling stock must be built through the Trainbuilder and manual rolling-stock placement is removed/refunded by script.
+- **Allow speed modules in Trainbuilders**: disabled by default. When enabled, Trainbuilders accept speed modules in addition to efficiency/consumption modules.
+
+
+## Quality support
+
+When the Space Age/Quality feature is active, the Trainbuilder preserves the quality of the train-part item used for a build and applies it to the created rolling stock. For example, rare locomotive parts create a rare locomotive. The generated fluid marker recipes themselves do not carry quality; the mod tracks the input item quality at runtime.
+
+
+## Optional mod compatibility for Factorio 2.0
+
+The fork only lists optional dependencies that currently have Factorio 2.0 releases on the Mod Portal or are known 2.0 targets. Legacy 1.1-only optional dependencies were removed from `info.json` so the fork does not advertise compatibility with mods that are not available for Factorio 2.0.
+
+Currently listed optional compatibility targets:
+
+- angelsaddons-mobility
+- Electronic_Locomotives
+- space-exploration
+- SchallOverseasRailway
+- pyhightech
+- EditorExtensions
+- MultipleUnitTrainControl
+- Krastorio2
+- Armored-train
+- assembler-pipe-passthrough
+- boblogistics / bobwarfare
+- LogisticTrainNetwork
+- Hovercrafts / laser_tanks / aai-programmable-vehicles
+- fast_trans
+- aai-industry / angelsbioprocessing / angelspetrochem
+- RenaiTransportation / VehicleWagon2 / cargo-ships
+- creative-mod
+
+Removed legacy optional dependencies include old 1.1-only train mods such as FARL, ElectricTrain, Battle_Locomotives, old Angel train add-ons, TrainOverhaul, SmartTrains, RailPowerSystem, JunkTrain3, Transport_Drones, Bio_Industries, and similar 1.1-only compatibility entries. Some harmless guarded legacy code may remain internally, but these mods are no longer advertised as supported dependencies for the Factorio 2.0 fork.

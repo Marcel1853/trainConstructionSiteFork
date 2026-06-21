@@ -1,7 +1,192 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.4.10
+Date: 21. 06. 2026
+  Bugfixes:
+    - Fixed potential crash when merging two neighbouring Trainbuilders with missing surface/position data.
+    - Fixed potential crash when rotating a Trainbuilder before render IDs are initialised.
+    - Fixed potential crash when renaming a depot via the controller GUI if the controller entity was destroyed.
+    - Fixed potential crash when applying locomotive color if the machine tint was not set.
+    - Fixed potential crash when opening the controller GUI if the controller entity was invalid or destroyed.
+    - Fixed migration cleanup for old Help GUI data and controller builder remapping.
+    - Fixed quality input inventory lookup to prefer the Factorio 2.0 crafter_input enum.
+    - Fixed changelog formatting errors (duplicate categories in several older versions).
+---------------------------------------------------------------------------------------------------
+Version: 0.4.7
+Date: 21. 06. 2026
+  Changes:
+    - Removed Factorio 1.1-only optional dependencies from info.json.
+    - Kept only optional dependencies that currently have Factorio 2.0 releases or are intended 2.0 compatibility targets.
+    - Documented supported Factorio 2.0 optional compatibility targets and removed legacy 1.1-only mods in README.
+    - Guarded legacy code may still exist internally where harmless, but unsupported 1.1-only mods are no longer advertised as supported dependencies.
+---------------------------------------------------------------------------------------------------
+Version: 0.4.6
+Date: 21. 06. 2026
+  Changes:
+    - Audited and hardened legacy optional mod compatibility files.
+    - Added safe wrappers around LSlib recipe, technology, and item compatibility edits so missing/renamed optional-mod prototypes are skipped instead of crashing data stage.
+    - Added nil guards for old Angel/Bob/AAI/Space Exploration/JunkTrain/FARL compatibility paths.
+    - Hardened extra modded train fuel recipe generation when optional fuel items or technologies are missing.
+    - Many legacy train mods from Factorio 1.1 are still untested on Factorio 2.0; unsupported/missing prototypes now log and skip rather than abort loading.
+---------------------------------------------------------------------------------------------------
+Version: 0.4.5
+Date: 21. 06. 2026
+  Changes:
+    - Changed "Allow manual placing of trains" from a startup setting to a runtime-global setting.
+  Bugfixes:
+    - Manual train placement can now be turned off and on again in an existing save without needing a prototype rebuild/restart.
+    - Train item place_result is kept available; script enforcement removes/refunds manually placed rolling stock only when the setting is disabled.
+---------------------------------------------------------------------------------------------------
+Version: 0.4.4
+Date: 21. 06. 2026
+  Features:
+    - Added Space Age / Quality support: the Trainbuilder captures the quality of the train-part ingredient and creates rolling stock with the same quality.
+    - Manual-placement blocking now refunds removed rolling stock with its original quality.
+  Changes:
+    - Trainbuilder recipes still use a fluid completion marker internally; quality is tracked at runtime from the input item because fluids cannot carry quality.
+---------------------------------------------------------------------------------------------------
+Version: 0.4.3
+Date: 21. 06. 2026
+  Features:
+    - Added startup setting to allow speed modules in Trainbuilders. Disabled by default.
+  Bugfixes:
+    - Enforced the manual train placement startup setting at runtime, so manually placed rolling stock is removed when the setting is disabled.
+    - Removed the old locomotive-manual-build exception when manual train placement is disabled.
+    - Updated EN/DE locale and Tips & Tricks text for the manual train placement and speed module settings.
+  Changes:
+    - Space Age loads and works on normal planetary rail surfaces. Elevated/diagonal rail building and train quality handling are not explicitly supported yet.
+---------------------------------------------------------------------------------------------------
+Version: 0.4.2
+Date: 21. 06. 2026
+  Bugfixes:
+    - Rails under/around Trainbuilders stay blueprintable, fixing missing rail pieces when copying/pasting Trainbuilder blueprints.
+    - Rails built by robots after a Trainbuilder are kept and protected instead of being destroyed.
+    - Removing a rail under a Trainbuilder now removes the invalid Trainbuilder as well to avoid floating builders.
+---------------------------------------------------------------------------------------------------
+Version: 0.4.1
+Date: 21. 06. 2026
+  Features:
+    - Enabled blueprinting for Trainbuilders, Trainbuilder controllers, and Traindepots.
+    - Added pending controller activation for robot/blueprint builds so controllers wait for builders/depots from the same blueprint instead of deleting themselves when built first.
+  Bugfixes:
+    - Removed the old hidden rail-signal entities used by train controllers and added a migration to destroy existing hidden signals, preventing blinking map markers.
+---------------------------------------------------------------------------------------------------
+Version: 0.4.0
+Date: 21. 06. 2026
+  Changes:
+    - Fork release for Factorio 2.0 under the internal mod id trainConstructionSiteFork.
+    - Visible mod title changed to "Train Construction Site Fork - Factorio 2.0 Update".
+    - Added Marcel171297 to the author list and README/Tips & Tricks credits.
+    - Added entity event filters for build/remove/death handlers so the mod no longer processes unrelated entity events in large factories.
+    - Optimised the construction-site clear check to use one bounded scan for the full builder instead of multiple per-machine/per-type searches.
+  Features:
+    - Added German locale files.
+  Bugfixes:
+    - Includes all Factorio 2.0 runtime, GUI, Tips & Tricks, recipe localisation, train dispatch, and compatibility fixes from the 0.3.x porting builds.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.15
+Date: 21. 06. 2026
+  Bugfixes:
+    - Added localised names to generated train-building recipes so assembler recipe buttons no longer show internal names like locomotive-fluid-locomotive.
+    - Added English/German fallback locale entries for the vanilla generated train-building recipes.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.14
+Date: 21. 06. 2026
+  Bugfixes:
+    - Disabled old Tips & Tricks scripted simulations that used removed Factorio 2.0 camera/test-player APIs, fixing create_test_player/camera_position errors when opening the tips.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.13
+Date: 21. 06. 2026
+  Features:
+    - Added German locale files.
+  Bugfixes:
+    - Fixed English traindepot item description key casing.
+    - Updated tips text to use Factorio 2.0 efficiency module names.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.12
+Date: 21. 06. 2026
+  Bugfixes:
+    - Added an explicit rolling-stock occupancy check around the construction site before starting the next train, preventing new trains from spawning into/coupling with the train that is still leaving.
+    - Added guards around hidden traincontroller signal checks for migrated/script-created controllers.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.11
+Date: 21. 06. 2026
+  Bugfixes:
+    - Fixed crash from Creative Mod/script_raised_revive when rails are revived on top of train assemblies without a player_index.
+    - Normalized train controller direction to 4-way directions and added a nearest-builder fallback so controllers can find builders despite Factorio 2.0 rail/stop snapping offsets.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.10
+Date: 21. 06. 2026
+  Bugfixes:
+    - Fixed Traincontroller GUI crash where a vertical flow used a horizontal flow style.
+    - Forced another GUI cache refresh for existing saves after splitting the configuration row and item styles.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.9
+Date: 21. 06. 2026
+  Bugfixes:
+    - Fixed Traincontroller GUI crash caused by removed research_queue_first_slot_flow style in Factorio 2.0.
+    - Hid the helper rail signals used internally by train controllers so visible signal graphics no longer appear next to the controller.
+    - Forced another GUI cache refresh for existing saves after replacing the removed style.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.8
+Date: 21. 06. 2026
+  Bugfixes:
+    - Forced cached Traincontroller/Traindepot GUI layouts in existing saves to refresh, fixing lingering utility/close_white crashes.
+    - Opening depot/controller GUIs now refreshes layout data defensively before creating the GUI.
+    - Removing a train controller no longer deletes an already assembled train on the rails.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.7
+Date: 21. 06. 2026
+  Bugfixes:
+    - Fixed train assembly direction detection for the new assembling-machine based placement preview.
+    - Made train controller builder detection more tolerant to Factorio 2.0 train stop/rail positioning offsets.
+    - Fixed another removed Factorio 2.0 utility sprite in depot/controller GUIs.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.6
+Date: 21. 06. 2026
+  Bugfixes:
+    - Fixed train assembly builder not being placeable on straight rails by restoring the old player-only collision behavior for the rail-mounted entities.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.5
+Date: 21. 06. 2026
+  Bugfixes:
+    - Reworked train assembly placement preview to use a dedicated assembling-machine based preview entity so it no longer appears as a locomotive.
+    - Restored building-style collision for train assembly entities while still allowing them to sit on rails.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.4
+Date: 21. 06. 2026
+  Bugfixes:
+    - Fixed depot/controller GUI crash caused by removed utility/close_white sprite in Factorio 2.0.
+    - Fixed train assembly placement preview using the base locomotive graphics instead of the train assembly graphics.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.3
+Date: 21. 06. 2026
+  Bugfixes:
+    - Fixed train assemblies being placeable without straight rails in Factorio 2.0.
+    - Added an overlap guard to prevent multiple train assemblies from being stacked on the same location.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.2
+Date: 21. 06. 2026
+  Bugfixes:
+    - Fixed Factorio 2.0 runtime crash when placing depots/controllers by replacing removed TrainStopControlBehavior.enable_disable with circuit_enable_disable.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.1
+Date: 21. 06. 2026
+  Bugfixes:
+    - Fixed Factorio 2.0 GUI style validation error where LSlib tab button styles inherited from the vanilla tab style with the wrong style type.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.0
+Date: 21. 06. 2026
+  Changes:
+    - Ported the mod to Factorio 2.0.
+    - Switched the library dependency to LSlib_James_Fork for Factorio 2.0.
+    - Migrated runtime persistent data from global to storage.
+    - Updated train schedules to use the Factorio 2.0 schedule API.
+    - Updated recipe/prototype definitions for Factorio 2.0 strict prototype loading.
+    - Updated collision masks, rail prototypes and GUI/rendering API usage for Factorio 2.0.
+---------------------------------------------------------------------------------------------------
 Version: 0.2.19
 Date: 13. 02. 2022
-  Buxfixes:
+  Bugfixes:
     - Fixed collision layers with mod "Hovercrafts"
     - Fixed crash when a traindepot becomes invalid
 ---------------------------------------------------------------------------------------------------
@@ -19,7 +204,7 @@ Date: 28. 12. 2021
     - Added support for modded trains with custom fuel
     - Added support for pyhightech trains
     - Added new technology icon for train construction
-  Buxfixes:
+  Bugfixes:
     - Fixed support for modded trains from "Armored-train"
     - Fixed support for modded locomotives from "cargo-ships"
     - Fixed the player could obtain the actual trian fuel when deconstructing a train inside the
@@ -49,6 +234,7 @@ Date: 01. 12. 2020
     - The traincontroller now shows the color LED next to the status
     - Removed the trainbuilder manual as it is obsolete (use tips and tricks instead)
     - Added a close button to the traincontroller UI and the traindepot UI
+    - Moved the hidden train recipe fuel item to the unsorted category and added a description
   Bugfixes:
     - Fixed hidden train signals were invalid due to base game changes in v1.1.0
     - Fixed crashes related to the color picker UI
@@ -57,8 +243,6 @@ Date: 01. 12. 2020
     - Fixed deconstructing the traincontroller would not return the build train to the trainbuilder
     - Fixed that rotating the trainbuilder would not rotate the created rolling stock
     - Fixed that changing the trainbuilder color would not color the created rolling stock directly
-  Modding:
-    - Moved the hidden train recipe fuel item to the unsorted category and added a description
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.13
 Date: 27. 11. 2020
@@ -247,7 +431,7 @@ Version: 0.1.9
 Date: 25. 07. 2019
   Bugfixes:
     - Fixed crash related when playing together with the mod "Automatic Train Station Names"
-  Modding:
+  Changes:
     - Reference to LSlib removed, now references LSlib directly
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.8
@@ -265,12 +449,11 @@ Date: 22. 07. 2019
     - Added support for modded trains from "Electronic_Battle_Locomotives"
   Changes:
     - Now tries to insert the correct amount of trainfuel (or none if not required)
+    - Added interface to register trains that do not require fuel.
   Bugfixes:
     - Fixed some missing functions in LSlib
     - Fixed that the recipes for placing down trains did not unlock when using an existing save
     - Fixed that the train placing fuel was showing up on the fuel tooltip while it can't be used
-  Modding:
-    - Added interface to register trains that do not require fuel.
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.6
 Date: 21. 07. 2019

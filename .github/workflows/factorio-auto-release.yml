@@ -1,0 +1,136 @@
+name: Auto Release & Upload Factorio Mod
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install jq, zip, rsync
+        run: sudo apt-get install -y jq zip rsync
+
+      - name: Read mod info
+        id: info
+        run: |
+          NAME=$(jq -r '.name' info.json)
+          VERSION=$(jq -r '.version' info.json)
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Mod: $NAME"
+          echo "🔖 Version: $VERSION"
+
+      - name: Check latest version on Mod Portal
+        id: check
+        run: |
+          echo "🔍 Checking existing mod on Factorio portal..."
+          HTTP_CODE=$(curl -s -o /tmp/portal_response.json -w "%{http_code}" \
+            "https://mods.factorio.com/api/v2/mods/${{ steps.info.outputs.name }}")
+
+          if [ "$HTTP_CODE" = "200" ] && jq . /tmp/portal_response.json >/dev/null 2>&1; then
+            LATEST=$(jq -r '.releases[-1].version // "none"' /tmp/portal_response.json)
+            echo "✅ Mod found on portal. Latest version: $LATEST"
+            echo "mod_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ Mod not found on portal (HTTP $HTTP_CODE). This must be uploaded manually first."
+            echo "⚠️ Go to https://mods.factorio.com/mod/init and upload the first version."
+            LATEST="none"
+            echo "mod_exists=false" >> $GITHUB_OUTPUT
+          fi
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+
+      - name: Abort if mod does not exist on portal yet
+        if: ${{ steps.check.outputs.mod_exists == 'false' }}
+        run: |
+          echo "❌ The mod '${{ steps.info.outputs.name }}' does not exist on the Factorio Mod Portal yet."
+          echo ""
+          echo "👉 You must upload the first version manually:"
+          echo "   1. Go to https://mods.factorio.com/mod/init"
+          echo "   2. Upload the ZIP file"
+          echo "   3. After that, this workflow will handle all future releases automatically."
+          exit 1
+
+      - name: Skip if version unchanged
+        if: ${{ steps.info.outputs.version == steps.check.outputs.latest }}
+        run: |
+          echo "ℹ️ Version ${{ steps.info.outputs.version }} already on portal — skipping upload."
+          exit 0
+
+      - name: Prepare mod folder
+        run: |
+          mkdir -p build/${{ steps.info.outputs.name }}
+          rsync -av --exclude 'build' --exclude '.git*' --exclude '.github' ./ build/${{ steps.info.outputs.name }}/
+
+      - name: Create ZIP archive
+        working-directory: build
+        run: |
+          zip -r "../${{ steps.info.outputs.name }}_${{ steps.info.outputs.version }}.zip" "${{ steps.info.outputs.name }}"
+          echo "📦 Created ${{ steps.info.outputs.name }}_${{ steps.info.outputs.version }}.zip"
+
+      - name: Initialize upload (init_upload)
+        id: init
+        run: |
+          echo "🚀 Requesting upload URL..."
+          RESPONSE=$(curl -s -X POST \
+            -H "Authorization: Bearer ${{ secrets.FACTORIO_MOD_PORTAL_TOKEN }}" \
+            -F "mod=${{ steps.info.outputs.name }}" \
+            https://mods.factorio.com/api/v2/mods/releases/init_upload)
+
+          if echo "$RESPONSE" | jq . >/dev/null 2>&1; then
+            UPLOAD_URL=$(echo "$RESPONSE" | jq -r '.upload_url // empty')
+          else
+            echo "❌ Invalid response from init_upload"
+            echo "$RESPONSE"
+            exit 1
+          fi
+
+          if [ -z "$UPLOAD_URL" ]; then
+            echo "❌ Failed to get upload URL"
+            echo "$RESPONSE"
+            exit 1
+          fi
+
+          echo "upload_url=$UPLOAD_URL" >> $GITHUB_OUTPUT
+          echo "✅ Got upload URL."
+
+      - name: Finish upload (finish_upload)
+        run: |
+          echo "📤 Uploading mod to Factorio Mod Portal..."
+          RESPONSE=$(curl -s -X POST \
+            -F "file=@${{ steps.info.outputs.name }}_${{ steps.info.outputs.version }}.zip" \
+            "${{ steps.init.outputs.upload_url }}")
+
+          echo "Portal response:"
+          echo "$RESPONSE"
+
+          if echo "$RESPONSE" | grep -q '"error"'; then
+            echo "❌ Upload failed."
+            exit 1
+          fi
+
+          echo "✅ Upload complete: ${{ steps.info.outputs.name }} v${{ steps.info.outputs.version }}"
+
+      - name: Update or create release branch
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git fetch origin || true
+          git checkout -B release
+          git merge --no-ff origin/main -m "Release ${{ steps.info.outputs.version }}" || true
+          git push origin release --force
+          echo "✅ Release branch updated."
+
+      - name: Create git tag
+        run: |
+          TAG="v${{ steps.info.outputs.version }}"
+          git tag -f "$TAG"
+          git push origin "$TAG" --force
+          echo "🏷️ Created tag $TAG"

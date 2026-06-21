@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 
 -- For the fuel needed to kick-start the engine to roll to a station, we need some fuel.
 -- Becose we don't want 10 different recipes for each fuel type, we make a new fuel type
@@ -13,22 +14,22 @@ local trainassemblyTrainfuel = util.table.deepcopy(data.raw["item"]["rocket-fuel
 
 trainassemblyTrainfuel.name           = "trainassembly-trainfuel"
 trainassemblyTrainfuel.localised_name = {"item-name.trainassemblyfuel"}
-trainassemblyTrainfuel.icon           = nil--"__trainConstructionSite__/graphics/placeholders/icon.png"
+trainassemblyTrainfuel.icon           = nil--"__trainConstructionSiteFork__/graphics/placeholders/icon.png"
 trainassemblyTrainfuel.icon_size      = nil--32
 trainassemblyTrainfuel.icons          = {
   {
-    icon      = "__trainConstructionSite__/graphics/item/trainfuel/loco/loco-64.png",
+    icon      = "__trainConstructionSiteFork__/graphics/item/trainfuel/loco/loco-64.png",
     icon_size = 64,
     shift     = {10, 0}
   },
   {
-    icon      = "__trainConstructionSite__/graphics/item/trainfuel/fuel-handle/fuel-handle-32.png",
+    icon      = "__trainConstructionSiteFork__/graphics/item/trainfuel/fuel-handle/fuel-handle-32.png",
     icon_size = 32,
     shift     = {-6, -8},
     scale     = 0.8,
   }
 }
-trainassemblyTrainfuel.icon_mipmaps   = 1
+trainassemblyTrainfuel.icon_mipmaps   = nil
 
 trainassemblyTrainfuel.subgroup       = "trainassembler-fuel"
 trainassemblyTrainfuel.order          = "b"
@@ -46,7 +47,7 @@ trainassemblyRecipefuel.fuel_emissions_multiplier    = nil
 
 -- STEP 3: make sure the player only can see the recipefuel
 trainassemblyTrainfuel.flags = trainassemblyTrainfuel.flags or {}
-table.insert(trainassemblyTrainfuel.flags, "hidden")
+trainassemblyTrainfuel.hidden = true
 table.insert(trainassemblyTrainfuel.flags, "hide-from-bonus-gui")
 table.insert(trainassemblyTrainfuel.flags, "hide-from-fuel-tooltip")
 trainassemblyTrainfuel.localised_description = {"item-description.trainassemblyfuel"}

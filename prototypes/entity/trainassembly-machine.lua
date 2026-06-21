@@ -1,10 +1,12 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
+local collision_mask_util = require("collision-mask-util")
 
 local trainassembly = util.table.deepcopy(data.raw["assembling-machine"]["assembling-machine-3"])
 trainassembly.name = "trainassembly-machine"
 
 -- adjusting minable time/hardness/result and pipette tool
 trainassembly.minable.mining_time = 5
-trainassembly.minable.hardness = 0.5
+trainassembly.minable.hardness = nil
 trainassembly.minable.result = "trainassembly" -- name of the item
 trainassembly.placeable_by = {item=trainassembly.minable.result, count= 1}
 
@@ -16,29 +18,24 @@ trainassembly.localised_description = util.table.deepcopy(data.raw["item"][train
 trainassembly.icon = util.table.deepcopy(data.raw["item"][trainassembly.minable.result].icon)
 trainassembly.icons = util.table.deepcopy(data.raw["item"][trainassembly.minable.result].icons)
 trainassembly.icon_size = util.table.deepcopy(data.raw["item"][trainassembly.minable.result].icon_size)
-trainassembly.icon_mipmaps = util.table.deepcopy(data.raw["item"][trainassembly.minable.result].icon_mipmaps)
+trainassembly.icon_mipmaps = nil
 
 -- define the order since this entity doesn't have a dedicated item
 trainassembly.subgroup = "other"
 trainassembly.order = "z-"..data.raw["item"][trainassembly.minable.result].order
 
--- make sure you can't blueprint it, becose you can't let robots place trains anyway
-table.insert(trainassembly.flags, "not-blueprintable")
+-- Blueprinting is supported by runtime validation/pending activation in 0.4.1.
 
 -- selection box
 trainassembly.selection_box = {{-3, -3}, {3, 3}}
-trainassembly.drawing_box = {{-3, -5}, {3, 3}}
+trainassembly.drawing_box_vertical_extension = 2
 
--- collision mask & box
-trainassembly.collision_mask = util.table.deepcopy(data.raw["locomotive"]["trainassembly-placeable"].collision_mask)
+-- collision mask & box. It must not collide with straight rails/trains because
+-- the machine sits on top of rails. This matches the old 1.1 logic where the
+-- train-layer was removed from the temporary locomotive collision mask, leaving
+-- only player collision. Runtime validation/placement blockers handle the rest.
+trainassembly.collision_mask = {layers = {player = true}}
 trainassembly.collision_box = {{-2.95, -2.95}, {2.95, 2.95}}
-
---delete train-layer so it doesn't collide with trains
-for collisionIndex, collisionLayer in pairs(trainassembly.collision_mask) do
-  if collisionLayer == "train-layer" then
-    table.remove(trainassembly.collision_mask, collisionIndex)
-  end
-end
 
 trainassembly.fast_replaceable_group = nil
 trainassembly.next_upgrade = nil
@@ -48,24 +45,25 @@ trainassembly.fluid_boxes = -- give it an output pipe so it has a direction
   { -- NOTE: This output is always on a train track, so no worries that a pipe
     --       would empty the fluid that is comming out of this.
     production_type = "output",
-    pipe_picture = nil,
-    pipe_covers = nil, -- The pictures to show when another fluid box connects to this one.
-    base_area = 0.01,  -- A base area of 1 will hold 100 units of water, 2 will hold 200, etc...
-    base_level = 0,    -- the 'Starting height' of the fluidbox
-    pipe_connections = {{ type="output", position = {0, -3.5} }}, -- output on the north side
-    --secondary_draw_orders = { north = -1 }
+    volume = 1,
+    pipe_connections = {{ flow_direction = "output", direction = defines.direction.north, position = {0, -2} }}, -- output on the north side
   },
-  off_when_no_fluid_recipe = false, -- makes sure it is showing the arrow
 }
+trainassembly.fluid_boxes_off_when_no_fluid_recipe = false -- makes sure it is showing the arrow
 
-trainassembly.max_health = data.raw["locomotive"]["trainassembly-placeable"].max_health
+trainassembly.max_health = data.raw["assembling-machine"]["assembling-machine-2"].max_health
 
 trainassembly.crafting_categories = {"trainassembling",}
 trainassembly.crafting_speed = 0.20
 trainassembly.energy_usage = "500kW"
-trainassembly.module_specification.module_slots = 5
-trainassembly.allowed_effects = {"consumption",}
-trainassembly.scale_entity_info_icon = true
+trainassembly.module_specification = nil
+trainassembly.module_slots = 5
+if settings.startup["trainController-allow-speed-modules"] and settings.startup["trainController-allow-speed-modules"].value then
+  trainassembly.allowed_effects = {"consumption", "speed"}
+else
+  trainassembly.allowed_effects = {"consumption"}
+end
+trainassembly.scale_entity_info_icon = nil
 
 -- 4 way animation
 trainassembly.animation =
@@ -75,7 +73,7 @@ trainassembly.animation =
     layers =
     {
       {
-        --filename = "__trainConstructionSite__/graphics/entity/trainassembly/trainassembly-N-base.png",
+        --filename = "__trainConstructionSiteFork__/graphics/entity/trainassembly/trainassembly-N-base.png",
         priority = "high",
         width = 512,
         height = 512,
@@ -92,7 +90,7 @@ trainassembly.animation =
     layers =
     {
       {
-        --filename = "__trainConstructionSite__/graphics/entity/trainassembly/trainassembly-E-base.png",
+        --filename = "__trainConstructionSiteFork__/graphics/entity/trainassembly/trainassembly-E-base.png",
         priority = "high",
         width = 512,
         height = 512,
@@ -109,7 +107,7 @@ trainassembly.animation =
     layers =
     {
       {
-        --filename = "__trainConstructionSite__/graphics/entity/trainassembly/trainassembly-S-base.png",
+        --filename = "__trainConstructionSiteFork__/graphics/entity/trainassembly/trainassembly-S-base.png",
         priority = "high",
         width = 512,
         height = 512,
@@ -126,7 +124,7 @@ trainassembly.animation =
     layers =
     {
       {
-        --filename = "__trainConstructionSite__/graphics/entity/trainassembly/trainassembly-W-base.png",
+        --filename = "__trainConstructionSiteFork__/graphics/entity/trainassembly/trainassembly-W-base.png",
         priority = "high",
         width = 512,
         height = 512,
@@ -154,7 +152,7 @@ for orientation,orientation_string in pairs{
       name = trainassembly.name .. "-" .. orientation .. animation_layer,
       layers = util.table.deepcopy(trainassembly.animation[orientation].layers),
     }
-    animation.layers[1].filename = "__trainConstructionSite__/graphics/entity/trainassembly/trainassembly-"..orientation_string..animation_layer..".png"
+    animation.layers[1].filename = "__trainConstructionSiteFork__/graphics/entity/trainassembly/trainassembly-"..orientation_string..animation_layer..".png"
     data:extend{animation}
   end
   trainassembly.animation[orientation].layers = {
@@ -208,12 +206,20 @@ for _,animation_layer in pairs{ "-base", "-overlay", "" } do
   end
 end
 
+trainassembly.graphics_set = {
+  animation = trainassembly.animation,
+  working_visualisations = trainassembly.working_visualisations,
+}
+trainassembly.animation = nil
+trainassembly.working_visualisations = nil
+
 data:extend{
   util.table.deepcopy(trainassembly),
 }
 
 -- now create the selector
 trainassembly.name = trainassembly.name .. "-recipe-selector"
+trainassembly.hidden = true
 
 for _,flag in pairs{
   "player-creation"  ,
@@ -228,7 +234,6 @@ for _,flag in pairs{
   end
 end
 for _,flag in pairs{
-  "hidden"                     ,
   "hide-alt-info"              ,
   "not-blueprintable"          ,
   "not-deconstructable"        ,
@@ -242,22 +247,24 @@ for _,flag in pairs{
 end
 
 trainassembly.selection_box = nil
-trainassembly.collision_mask = {}
+trainassembly.collision_mask = {layers = {}}
 trainassembly.collision_box = {{-.49, -.49}, {.49, .49}}
 
-trainassembly.fluid_boxes[1].pipe_connections[1].position = {0, -1}
+trainassembly.fluid_boxes[1].pipe_connections[1].position = {0, 0}
 
 trainassembly.energy_source.render_no_power_icon = false
 trainassembly.energy_source.render_no_network_icon = false
 
-trainassembly.animation =
-{
-  filename = "__core__/graphics/empty.png",
-  priorit = "very-low",
-  width = 1,
-  height = 1,
-  frame_count = 1,
+trainassembly.graphics_set = {
+  animation = {
+    filename = "__core__/graphics/empty.png",
+    priority = "very-low",
+    width = 1,
+    height = 1,
+    frame_count = 1,
+  },
 }
+trainassembly.animation = nil
 trainassembly.working_visualisations = nil
 
 data:extend{
