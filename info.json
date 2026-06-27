@@ -1,6 +1,6 @@
 {
   "name": "trainConstructionSiteFork",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "factorio_version": "2.1",
   "title": "Train Construction Site Fork - Factorio 2.1 Update",
   "author": "voske_123, lovely_santa, Marcel171297",
@@ -9,7 +9,7 @@
   "dependencies": [
     "base >= 2.1",
     "! trainConstructionSite",
-    "FactoryLib >= 0.2.1",
+    "FactoryLib >= 0.2.2",
     "? angelsaddons-mobility",
     "? Electronic_Locomotives",
     "? space-exploration",
