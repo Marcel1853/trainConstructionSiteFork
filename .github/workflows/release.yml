@@ -3,7 +3,7 @@ name: Auto Release & Upload Factorio Mod
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build_and_upload:
