@@ -30,7 +30,7 @@ for _,trainType in pairs({
           }
         }
 
-        local train_layers = LSlib.item.getIcons(item.type, item.name, 32/(LSlib.item.getIconSize(item.type, item.name)[1] or 32) * 0.65)
+        local train_layers = FLib.item.getIcons(item.type, item.name, 32/(FLib.item.getIconSize(item.type, item.name)[1] or 32) * 0.65)
         for _, train_layer in pairs(train_layers) do
           table.insert(item_icons, train_layer)
         end

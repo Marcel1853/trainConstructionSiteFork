@@ -83,10 +83,10 @@ function Traindepot:deleteBuilding(depotEntity)
   if storage.TD_data["depots"][depotSurfaceIndex][depotPosition.y][depotPosition.x] then
     storage.TD_data["depots"][depotSurfaceIndex][depotPosition.y][depotPosition.x] = nil
 
-    if LSlib.utils.table.isEmpty(storage.TD_data["depots"][depotSurfaceIndex][depotPosition.y]) then
+    if FLib.utils.table.isEmpty(storage.TD_data["depots"][depotSurfaceIndex][depotPosition.y]) then
       storage.TD_data["depots"][depotSurfaceIndex][depotPosition.y] = nil
 
-      if LSlib.utils.table.isEmpty(storage.TD_data["depots"][depotSurfaceIndex]) then
+      if FLib.utils.table.isEmpty(storage.TD_data["depots"][depotSurfaceIndex]) then
         storage.TD_data["depots"][depotSurfaceIndex] = nil
       end
     end
@@ -151,10 +151,10 @@ function Traindepot:setStationAmount(depotForceName, depotSurfaceIndex, depotNam
   else -- newStationAmount is 0, remove it
     storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex][depotName] = nil
 
-    if LSlib.utils.table.isEmpty(storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex]) then
+    if FLib.utils.table.isEmpty(storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex]) then
       storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex] = nil
 
-      if LSlib.utils.table.isEmpty(storage.TD_data["depotStatistics"][depotForceName]) then
+      if FLib.utils.table.isEmpty(storage.TD_data["depotStatistics"][depotForceName]) then
         storage.TD_data["depotStatistics"][depotForceName] = nil
       end
     end
@@ -199,7 +199,7 @@ function Traindepot:hasDepotEntities(depotForceName, depotSurfaceIndex)
   -- returns true if at least one depot has been build on the force on that surface
   if storage.TD_data["depotStatistics"][depotForceName] and
       storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex] then
-    return not LSlib.utils.table.isEmpty(storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex])
+    return not FLib.utils.table.isEmpty(storage.TD_data["depotStatistics"][depotForceName][depotSurfaceIndex])
   end
   return false
 end

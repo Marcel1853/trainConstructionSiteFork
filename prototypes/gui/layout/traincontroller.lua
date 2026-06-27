@@ -1,39 +1,39 @@
 ---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 
-local guiLayout = LSlib.gui.layout.create("screen")
+local guiLayout = FLib.gui.layout.create("screen")
 
-local guiFlow = LSlib.gui.layout.addFrame(guiLayout, "root", "traincontroller-gui", "horizontal", {
+local guiFlow = FLib.gui.layout.addFrame(guiLayout, "root", "traincontroller-gui", "horizontal", {
   style = "traincontroller_contentFlowingFrame", -- no padding
 })
 
-local guiFrame = LSlib.gui.layout.addFrame(guiLayout, guiFlow, "traincontroller-mainframe", "vertical", {
+local guiFrame = FLib.gui.layout.addFrame(guiLayout, guiFlow, "traincontroller-mainframe", "vertical", {
   --caption = {"item-name.traincontroller", {[1] = "item-name.trainassembly"}},
   style   = "frame",
 })
 
-local guiFrameHeaderFlow = LSlib.gui.layout.addFlow(guiLayout, guiFrame, "traincontroller-mainframe-gui-header", "horizontal", {
+local guiFrameHeaderFlow = FLib.gui.layout.addFlow(guiLayout, guiFrame, "traincontroller-mainframe-gui-header", "horizontal", {
   style = "LSlib_default_header",
 })
 
-LSlib.gui.layout.addLabel(guiLayout, guiFrameHeaderFlow, "traincontroller-mainframe-gui-header-title", {
+FLib.gui.layout.addLabel(guiLayout, guiFrameHeaderFlow, "traincontroller-mainframe-gui-header-title", {
   caption = {"item-name.traincontroller", {[1] = "item-name.trainassembly"}},
   style   = "LSlib_default_frame_title",
   ignored_by_interaction = true,
 })
-LSlib.gui.layout.addEmptyWidget(guiLayout, guiFrameHeaderFlow, "traincontroller-mainframe-gui-header-filler", {
+FLib.gui.layout.addEmptyWidget(guiLayout, guiFrameHeaderFlow, "traincontroller-mainframe-gui-header-filler", {
   drag_target = guiFlow,
   style       = "LSlib_default_draggable_header",
 })
---LSlib.gui.layout.addSpriteButton(guiLayout, guiFrameHeaderFlow, "traincontroller-help", {
+--FLib.gui.layout.addSpriteButton(guiLayout, guiFrameHeaderFlow, "traincontroller-help", {
 --  sprite = "utility/questionmark"      ,
 --  style = "LSlib_default_header_button",
 --})
-LSlib.gui.layout.addSpriteButton(guiLayout, guiFrameHeaderFlow, "traincontroller-close", {
+FLib.gui.layout.addSpriteButton(guiLayout, guiFrameHeaderFlow, "traincontroller-close", {
   sprite = "utility/close"      ,
   style = "LSlib_default_header_button",
 })
 
-local guiTabContent = LSlib.gui.layout.addTabs(guiLayout, guiFrame, "traincontroller-tab", {
+local guiTabContent = FLib.gui.layout.addTabs(guiLayout, guiFrame, "traincontroller-tab", {
   { -- first tab
     name     = "-statistics"     ,
     caption  = {"gui-traincontroller.tab-statistics"},
@@ -57,28 +57,28 @@ local guiTabContent = LSlib.gui.layout.addTabs(guiLayout, guiFrame, "traincontro
 --------------------------------------------------------------------------------
 -- Name selection tab                                                         --
 --------------------------------------------------------------------------------
-local guiTabContent2 = LSlib.gui.layout.getTabContentFrameFlow(guiLayout, guiTabContent, 2)
+local guiTabContent2 = FLib.gui.layout.getTabContentFrameFlow(guiLayout, guiTabContent, 2)
 
-local guiSelectedEntryFlow = LSlib.gui.layout.addFlow(guiLayout, guiTabContent2, "selected-depot", "horizontal", {
+local guiSelectedEntryFlow = FLib.gui.layout.addFlow(guiLayout, guiTabContent2, "selected-depot", "horizontal", {
   --style = "centering_horizontal_flow",
   style = "traincontroller_new_entry_flow",
 })
 
-LSlib.gui.layout.addLabel(guiLayout, guiSelectedEntryFlow, "selected-depot-label", {
+FLib.gui.layout.addLabel(guiLayout, guiSelectedEntryFlow, "selected-depot-label", {
   caption = {"", {"gui-traincontroller.selected-entry-label"}, " [img=info]"},
   tooltip = {"gui-traincontroller.selected-entry-label-tooltip"}             ,
 })
-LSlib.gui.layout.addLabel(guiLayout, guiSelectedEntryFlow, "selected-depot-name", {
+FLib.gui.layout.addLabel(guiLayout, guiSelectedEntryFlow, "selected-depot-name", {
   caption = "Enter controller name"                             ,
   tooltip = {"gui-traincontroller.selected-entry-label-tooltip"},
   style   = "traincontroller_selected_entry_label"              ,
 })
-LSlib.gui.layout.addSpriteButton(guiLayout, guiSelectedEntryFlow, "selected-depot-enter", {
+FLib.gui.layout.addSpriteButton(guiLayout, guiSelectedEntryFlow, "selected-depot-enter", {
   sprite = "utility/enter",
   style = "tool_button"   ,
 })
 
-LSlib.gui.layout.addListbox(guiLayout, guiTabContent2, "selected-depot-list", {
+FLib.gui.layout.addListbox(guiLayout, guiTabContent2, "selected-depot-list", {
   items = {"test1", "test2", "test3"},
   style = "traincontroller_select_name_list_box",
 })
@@ -88,61 +88,61 @@ LSlib.gui.layout.addListbox(guiLayout, guiTabContent2, "selected-depot-list", {
 --------------------------------------------------------------------------------
 -- statistics tab                                                             --
 --------------------------------------------------------------------------------
-local guiTabContent1 = LSlib.gui.layout.getTabContentFrameFlow(guiLayout, guiTabContent, 1)
+local guiTabContent1 = FLib.gui.layout.getTabContentFrameFlow(guiLayout, guiTabContent, 1)
 
-local statistics = LSlib.gui.layout.addTable(guiLayout, guiTabContent1, "statistics", 2, {
+local statistics = FLib.gui.layout.addTable(guiLayout, guiTabContent1, "statistics", 2, {
   style = "traindepot_statistics_table",
 })
 
 -- name
-LSlib.gui.layout.addLabel(guiLayout, statistics, "statistics-station-id", {
+FLib.gui.layout.addLabel(guiLayout, statistics, "statistics-station-id", {
   caption = {"", {"gui-traincontroller.connected-depot-name"}, " [img=info]"},
   tooltip = {"gui-traincontroller.connected-depot-name-tooltip"},
 })
-local stationIDflow = LSlib.gui.layout.addFlow(guiLayout, statistics, "statistics-station-id-flow", "horizontal", {
+local stationIDflow = FLib.gui.layout.addFlow(guiLayout, statistics, "statistics-station-id-flow", "horizontal", {
   style = "centering_horizontal_flow",
 })
-LSlib.gui.layout.addLabel(guiLayout, stationIDflow, "statistics-station-id-value", {
+FLib.gui.layout.addLabel(guiLayout, stationIDflow, "statistics-station-id-value", {
   caption = {"gui-traindepot.unused-depot-name"},
   ignored_by_interaction = true,
 })
-LSlib.gui.layout.addSpriteButton(guiLayout, stationIDflow, "statistics-station-id-edit", {
+FLib.gui.layout.addSpriteButton(guiLayout, stationIDflow, "statistics-station-id-edit", {
   sprite = "utility/rename_icon",
   style = "mini_button",
 })
 
 -- depot requests
-LSlib.gui.layout.addLabel(guiLayout, statistics, "statistics-depot-request", {
+FLib.gui.layout.addLabel(guiLayout, statistics, "statistics-depot-request", {
   caption = {"", {"gui-traincontroller.depot-availability"}, " [img=info]"},
   tooltip = {"gui-traincontroller.depot-availability-tooltip"},
 })
-LSlib.gui.layout.addLabel(guiLayout, statistics, "statistics-depot-request-value", {
+FLib.gui.layout.addLabel(guiLayout, statistics, "statistics-depot-request-value", {
   caption = "-999/999",
   ignored_by_interaction = true,
 })
 
 -- controller status
-LSlib.gui.layout.addLabel(guiLayout, statistics, "statistics-builder-status", {
+FLib.gui.layout.addLabel(guiLayout, statistics, "statistics-builder-status", {
   caption = {"gui-traincontroller.builder-status"},
   ignored_by_interaction = true,
 })
-LSlib.gui.layout.addLabel(guiLayout, statistics, "statistics-builder-status-value", {
+FLib.gui.layout.addLabel(guiLayout, statistics, "statistics-builder-status-value", {
   caption = "undefined status",
   ignored_by_interaction = true,
 })
 
 -- controller configuration
-LSlib.gui.layout.addLabel(guiLayout, statistics, "statistics-builder-configuration", {
+FLib.gui.layout.addLabel(guiLayout, statistics, "statistics-builder-configuration", {
   caption = {"gui-traincontroller.builder-configuration"},
   ignored_by_interaction = true,
 })
-local controllerFlow = LSlib.gui.layout.addScrollPane(guiLayout, guiTabContent1, "statistics-builder-configuration-flow-scrolling", {
+local controllerFlow = FLib.gui.layout.addScrollPane(guiLayout, guiTabContent1, "statistics-builder-configuration-flow-scrolling", {
   horizontal_scroll_policy = "always",
   vertical_scroll_policy   = "never" ,
 
   style = "traincontroller_configuration_scrollpane",
 })
-controllerFlow = LSlib.gui.layout.addFlow(guiLayout, controllerFlow, "statistics-builder-configuration-flow", "horizontal", {
+controllerFlow = FLib.gui.layout.addFlow(guiLayout, controllerFlow, "statistics-builder-configuration-flow", "horizontal", {
   style = "traincontroller_configuration_row_flow", -- no padding
 })
 
@@ -151,14 +151,14 @@ controllerFlow = LSlib.gui.layout.addFlow(guiLayout, controllerFlow, "statistics
 --------------------------------------------------------------------------------
 -- color picker                                                               --
 --------------------------------------------------------------------------------
-local colorPicker = LSlib.gui.layout.addFrame(guiLayout, guiFlow, "traincontroller-color-picker", "vertical", {
+local colorPicker = FLib.gui.layout.addFrame(guiLayout, guiFlow, "traincontroller-color-picker", "vertical", {
   visible = false
 })
---LSlib.gui.layout.addFrame(guiLayout, colorPicker, "traincontroller-color-picker-button-filler", "vertical", {
+--FLib.gui.layout.addFrame(guiLayout, colorPicker, "traincontroller-color-picker-button-filler", "vertical", {
 --  style = "LSlib_default_header_filler",
 --  ignored_by_interaction = true,
 --})
-LSlib.gui.layout.addEmptyWidget(guiLayout, colorPicker, "traincontroller-color-picker-button-filler", {
+FLib.gui.layout.addEmptyWidget(guiLayout, colorPicker, "traincontroller-color-picker-button-filler", {
   drag_target = guiFlow,
   style       = "LSlib_default_draggable_header",
 })
@@ -166,43 +166,43 @@ LSlib.gui.layout.addEmptyWidget(guiLayout, colorPicker, "traincontroller-color-p
 for _,color in pairs{"red", "green", "blue"} do
   local colorName = "traincontroller-color-picker-%s"
 
-  local colorPickerColorFlow = LSlib.gui.layout.addFlow(guiLayout, colorPicker, string.format(colorName, string.format("flow-%s", string.sub(color, 1, 1))), "horizontal", {
+  local colorPickerColorFlow = FLib.gui.layout.addFlow(guiLayout, colorPicker, string.format(colorName, string.format("flow-%s", string.sub(color, 1, 1))), "horizontal", {
     style = "centering_horizontal_flow",
   })
-  LSlib.gui.layout.addLabel(guiLayout, colorPickerColorFlow, string.format(colorName, "label"), {
+  FLib.gui.layout.addLabel(guiLayout, colorPickerColorFlow, string.format(colorName, "label"), {
     caption = string.upper(string.sub(color, 1, 1)),
     ignored_by_interaction = true,
   })
-  LSlib.gui.layout.addSlider(guiLayout, colorPickerColorFlow, string.format(colorName, "slider"), {
+  FLib.gui.layout.addSlider(guiLayout, colorPickerColorFlow, string.format(colorName, "slider"), {
     minimum_value = 0  ,
     maximum_value = 255,
     value         = 127,
 
     style         = string.format("%s_slider", color),
   })
-  LSlib.gui.layout.addTextfield(guiLayout, colorPickerColorFlow, string.format(colorName, "textfield"), {
+  FLib.gui.layout.addTextfield(guiLayout, colorPickerColorFlow, string.format(colorName, "textfield"), {
     text    = "-1",
     style = "slider_value_textfield",
   })
 end
-LSlib.gui.layout.addEntityPreview(guiLayout, colorPicker, "traincontroller-color-picker-entity-preview", {
+FLib.gui.layout.addEntityPreview(guiLayout, colorPicker, "traincontroller-color-picker-entity-preview", {
   style = "traincontroller_color_picker_entity_preview",
   ignored_by_interaction = true,
 })
 
-local colorPickerButtonFlow = LSlib.gui.layout.addFlow(guiLayout, colorPicker, "traincontroller-color-picker-button-flow", "horizontal", {
+local colorPickerButtonFlow = FLib.gui.layout.addFlow(guiLayout, colorPicker, "traincontroller-color-picker-button-flow", "horizontal", {
   style = "traincontroller_color_picker_button_flow",
 })
-LSlib.gui.layout.addButton(guiLayout, colorPickerButtonFlow, "traincontroller-color-picker-button-discard", {
+FLib.gui.layout.addButton(guiLayout, colorPickerButtonFlow, "traincontroller-color-picker-button-discard", {
   caption = {"gui-traincontroller.discard"},
   tooltip = {"discard-changes"},
   style = "red_back_button"
 })
-LSlib.gui.layout.addFrame(guiLayout, colorPickerButtonFlow, "traincontroller-color-picker-button-filler", "vertical", {
+FLib.gui.layout.addFrame(guiLayout, colorPickerButtonFlow, "traincontroller-color-picker-button-filler", "vertical", {
   style = "LSlib_default_footer_filler",
   ignored_by_interaction = true,
 })
-LSlib.gui.layout.addButton(guiLayout, colorPickerButtonFlow, "traincontroller-color-picker-button-confirm", {
+FLib.gui.layout.addButton(guiLayout, colorPickerButtonFlow, "traincontroller-color-picker-button-confirm", {
   caption = {"gui-traincontroller.confirm"},
   tooltip = {"gui-traincontroller.confirm-tooltip"},
   style = "confirm_button"

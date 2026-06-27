@@ -70,7 +70,7 @@ return function(configurationData)
               ["overlay"] = "item-in-inserter-hand"
             } do
               renderIDs[animationLayer] = rendering.draw_animation{
-                animation = machineEntity.name .. "-" .. LSlib.utils.directions.toString(machineEntity.direction) .. "-" .. animationLayer,
+                animation = machineEntity.name .. "-" .. FLib.utils.directions.toString(machineEntity.direction) .. "-" .. animationLayer,
                 render_layer = renderLayer,
                 target = machineEntity,
                 surface = machineEntity.surface,
@@ -146,7 +146,7 @@ return function(configurationData)
             end
             if machineData.entity and machineData.entity.valid and machineData.renderID then
               for _, animationLayer in pairs{"base", "overlay"} do
-                compat.set_render_animation(machineData.renderID[animationLayer], machineData.entity.name .. "-" .. LSlib.utils.directions.toString(machineData.direction or machineData.entity.direction) .. "-" .. animationLayer)
+                compat.set_render_animation(machineData.renderID[animationLayer], machineData.entity.name .. "-" .. FLib.utils.directions.toString(machineData.direction or machineData.entity.direction) .. "-" .. animationLayer)
               end
             end
           end
@@ -171,7 +171,7 @@ return function(configurationData)
                 },
               }) do
                 railEntity.destructible = false
-                railEntity.minable = true -- keep rails selectable/blueprintable
+                railEntity.minable_flag = true -- keep rails selectable/blueprintable
               end
             end
           end
@@ -198,7 +198,7 @@ return function(configurationData)
     --------------------------------------------------
     if storage.TC_data.version == 1 then
       log("Updating Traincontroller from version 1 to version 2.")
-      if LSlib.utils.table.isEmpty(storage.TC_data["trainControllers"]) and storage.TC_data["nextTrainControllerIterate"] then
+      if FLib.utils.table.isEmpty(storage.TC_data["trainControllers"]) and storage.TC_data["nextTrainControllerIterate"] then
         storage.TC_data["nextTrainControllerIterate"] = nil
         Traincontroller.Builder:deactivateOnTick()
       end
@@ -390,10 +390,10 @@ return function(configurationData)
                 if storage.TD_data["depots"][depotSurfaceIndex][depotPositionY][depotPositionX] then
                   storage.TD_data["depots"][depotSurfaceIndex][depotPositionY][depotPositionX] = nil
 
-                  if LSlib.utils.table.isEmpty(storage.TD_data["depots"][depotSurfaceIndex][depotPositionY]) then
+                  if FLib.utils.table.isEmpty(storage.TD_data["depots"][depotSurfaceIndex][depotPositionY]) then
                     storage.TD_data["depots"][depotSurfaceIndex][depotPositionY] = nil
 
-                    if LSlib.utils.table.isEmpty(storage.TD_data["depots"][depotSurfaceIndex]) then
+                    if FLib.utils.table.isEmpty(storage.TD_data["depots"][depotSurfaceIndex]) then
                       storage.TD_data["depots"][depotSurfaceIndex] = nil
                     end
                   end

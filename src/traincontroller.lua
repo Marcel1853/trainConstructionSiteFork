@@ -14,7 +14,7 @@ local function getEntity4WayDirection(entity)
       direction == defines.direction.west then
     return direction
   end
-  return LSlib.utils.directions.orientationTo4WayDirection(entity and entity.orientation or 0)
+  return FLib.utils.directions.orientationTo4WayDirection(entity and entity.orientation or 0)
 end
 require 'src.traincontroller-builder'
 require 'src.traincontroller-gui'
@@ -174,7 +174,7 @@ function Traincontroller:saveNewStructure(controllerEntity, trainBuilderIndex)
     util.table.deepcopy(nextController)
 
     -- STEP 2d: make sure the next iteration doesn't skip this new controller
-    if LSlib.utils.table.areEqual(storage.TC_data["nextTrainControllerIterate"], nextController) then
+    if FLib.utils.table.areEqual(storage.TC_data["nextTrainControllerIterate"], nextController) then
       storage.TC_data["nextTrainControllerIterate"] = util.table.deepcopy(thisController)
     end
   end
@@ -259,9 +259,9 @@ function Traincontroller:deleteController(controllerEntity)
   util.table.deepcopy(prevController)
 
   -- STEP 2d: make sure the next iteration does skip this old controller
-  if LSlib.utils.table.areEqual(storage.TC_data["nextTrainControllerIterate"], thisController) then
+  if FLib.utils.table.areEqual(storage.TC_data["nextTrainControllerIterate"], thisController) then
     -- Make sure the next controller isn't this controller, then there are no controllers.
-    if LSlib.utils.table.areEqual(thisController, nextController) then
+    if FLib.utils.table.areEqual(thisController, nextController) then
       storage.TC_data["nextTrainControllerIterate"] = nil
       -- this is the last one, no need to keep iterating on_tick
       self.Builder:deactivateOnTick()
@@ -273,10 +273,10 @@ function Traincontroller:deleteController(controllerEntity)
   -- STEP 2e: Delete this controller
   storage.TC_data["trainControllers"][controllerSurfaceIndex][controllerPosition.y][controllerPosition.x] = nil
 
-  if LSlib.utils.table.isEmpty(storage.TC_data["trainControllers"][controllerSurfaceIndex][controllerPosition.y]) then
+  if FLib.utils.table.isEmpty(storage.TC_data["trainControllers"][controllerSurfaceIndex][controllerPosition.y]) then
     storage.TC_data["trainControllers"][controllerSurfaceIndex][controllerPosition.y] = nil
   end
-  if LSlib.utils.table.isEmpty(storage.TC_data["trainControllers"][controllerSurfaceIndex]) then
+  if FLib.utils.table.isEmpty(storage.TC_data["trainControllers"][controllerSurfaceIndex]) then
     storage.TC_data["trainControllers"][controllerSurfaceIndex] = nil
   end
   --game.print(serpent.block(storage.TC_data["trainControllers"]))
@@ -296,10 +296,10 @@ function Traincontroller:deleteController(controllerEntity)
     else
       storage.TC_data["trainControllerNamesCount"][controllerForceName][controllerSurfaceIndex][stationName] = nil
 
-      if LSlib.utils.table.isEmpty(storage.TC_data["trainControllerNamesCount"][controllerForceName][controllerSurfaceIndex]) then
+      if FLib.utils.table.isEmpty(storage.TC_data["trainControllerNamesCount"][controllerForceName][controllerSurfaceIndex]) then
         storage.TC_data["trainControllerNamesCount"][controllerForceName][controllerSurfaceIndex] = nil
 
-        if LSlib.utils.table.isEmpty(storage.TC_data["trainControllerNamesCount"][controllerForceName]) then
+        if FLib.utils.table.isEmpty(storage.TC_data["trainControllerNamesCount"][controllerForceName]) then
           storage.TC_data["trainControllerNamesCount"][controllerForceName] = nil
         end
       end
@@ -488,7 +488,7 @@ function Traincontroller:hasTrainBuilderEntities(controllerForceName, controller
   -- returns true if at least one depot has been build on the force on that surface
   if storage.TC_data["trainControllerNamesCount"][controllerForceName] and
       storage.TC_data["trainControllerNamesCount"][controllerForceName][controllerSurfaceIndex] then
-    return not LSlib.utils.table.isEmpty(storage.TC_data["trainControllerNamesCount"][controllerForceName]
+    return not FLib.utils.table.isEmpty(storage.TC_data["trainControllerNamesCount"][controllerForceName]
     [controllerSurfaceIndex])
   end
   return false

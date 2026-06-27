@@ -1,4 +1,17 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.5.4
+Date: 27. 06. 2026
+  Features:
+    - Ported to Factorio 2.1.
+    - Added Factorio 2.1 rail items (rail ramp, rail support) to the Transport Logistics item group.
+  Changes:
+    - Updated factorio_version to 2.1 and base dependency to >= 2.1.
+    - Replaced LSlib_James_Fork dependency with FactoryLib — a new standalone utility library built for Factorio 2.1. LSlib_James_Fork has not been updated since December 2024 and it is unclear if it will receive a Factorio 2.1 update, so a custom replacement library was created.
+    - Replaced entity.fluidbox reads with get_fluid(index) and remove_fluid(index, amount) for Factorio 2.1 where the fluidbox property has been removed from LuaEntity.
+    - Replaced all runtime entity.minable writes with entity.minable_flag (entity.minable is no longer writable in 2.1).
+    - Changed all recipe prototypes from category (string) to categories (array), as required by Factorio 2.1.
+    - Updated mod title and description to reflect Factorio 2.1.
+---------------------------------------------------------------------------------------------------
 Version: 0.4.10
 Date: 21. 06. 2026
   Bugfixes:

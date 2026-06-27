@@ -2,15 +2,15 @@
 require("compat.lslib")
 
 local function createRecipeIcons(itemPrototypeName)
-  local recipeIcons = util.table.deepcopy(LSlib.item.getIcons("item", "trainassembly-recipefuel"))
+  local recipeIcons = util.table.deepcopy(FLib.item.getIcons("item", "trainassembly-recipefuel"))
   recipeIcons[2].shift = {-16, -20}
   recipeIcons[2].scale = 1.2
   local recipeIconsLength = #recipeIcons -- number of layers to offset the existing layers
 
   local baseIconSize = recipeIcons[1].icon_size or 64
-  local itemIconSize = (LSlib.item.getIconSize("item", itemPrototypeName) or {})[1] or 64
+  local itemIconSize = (FLib.item.getIconSize("item", itemPrototypeName) or {})[1] or 64
   local extraScale = baseIconSize / itemIconSize
-  for layerIndex,layerData in pairs(LSlib.item.getIcons("item", itemPrototypeName, 0.4 * extraScale, {-20, 19})) do
+  for layerIndex,layerData in pairs(FLib.item.getIcons("item", itemPrototypeName, 0.4 * extraScale, {-20, 19})) do
     recipeIcons[recipeIconsLength + layerIndex] = layerData -- add layer to recipelayer
   end
   return recipeIcons
@@ -36,7 +36,7 @@ for fuelOrder, fuelIngredient in pairs{
       icon      = nil, -- becose icons is present, no icon      required
       icon_size = nil, -- becose icons is present, no icon_size required
 
-      category = "advanced-crafting",
+      categories = {"advanced-crafting"},
       enabled = false,
       energy_required = 5,
       ingredients =

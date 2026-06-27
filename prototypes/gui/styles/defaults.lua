@@ -1,8 +1,8 @@
 ---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
--- Factorio 2.0-safe replacement for the small set of LSlib default styles used
+-- Factorio 2.0-safe replacement for the small set of FLib default styles used
 -- by this mod.
 --
--- Do NOT call LSlib.styles.addTabStyle() here: older LSlib builds create
+-- Do NOT call FLib.styles.addTabStyle() here: older FLib builds create
 -- button styles inheriting from the 2.0 "tab" style (a tab_style), which causes
 -- "Style of type Button has parent element tab which has wrong type" during
 -- prototype validation. We define/overwrite the needed styles directly.

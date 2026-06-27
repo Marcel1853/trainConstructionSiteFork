@@ -1,7 +1,7 @@
-# Train Construction Site Fork - Factorio 2.0 Update
+# Train Construction Site Fork - Factorio 2.1 Update
 
-> This is the Factorio 2.0 fork/update of Train Construction Site.
-> Original authors: Lovely_santa and Voske_123. Factorio 2.0 update and maintenance by Marcel171297.
+> This is the Factorio 2.1 fork/update of Train Construction Site.
+> Original authors: Lovely_santa and Voske_123. Factorio 2.1 update and maintenance by Marcel171297.
 
 # 1. Introduction
 Dear player,
@@ -100,16 +100,16 @@ This mod is still in development, changes may occur and bugs will be fixed.
 See [ingame changelog](https://mods.factorio.com/mod/trainConstructionSiteFork/changelog) or find it [here on github](https://github.com/voske123/FactorioMod-trainConstructionSite/blob/master/changelog.txt).
 
 
-# 6. Factorio 2.0 update
+# 6. Factorio 2.1 update
 
-This fork has been updated and maintained for Factorio 2.0.
+This fork has been updated and maintained for Factorio 2.1.
 
-- Visible mod title: **Train Construction Site Fork - Factorio 2.0 Update**
+- Visible mod title: **Train Construction Site Fork - Factorio 2.1 Update**
 - Original authors: **Lovely_santa** and **Voske_123**
-- Factorio 2.0 update and maintenance: **Marcel171297**
+- Factorio 2.1 update and maintenance: **Marcel171297**
 - Internal fork mod name: `trainConstructionSiteFork`. It conflicts with the original `trainConstructionSite` mod and should not be enabled at the same time.
 
-The port includes Factorio 2.0 API fixes, German localisation, GUI/runtime compatibility fixes, and performance/safety improvements around train dispatching.
+The port includes Factorio 2.1 API fixes, German localisation, GUI/runtime compatibility fixes, and performance/safety improvements around train dispatching.
 
 
 ## Settings
@@ -123,9 +123,9 @@ The port includes Factorio 2.0 API fixes, German localisation, GUI/runtime compa
 When the Space Age/Quality feature is active, the Trainbuilder preserves the quality of the train-part item used for a build and applies it to the created rolling stock. For example, rare locomotive parts create a rare locomotive. The generated fluid marker recipes themselves do not carry quality; the mod tracks the input item quality at runtime.
 
 
-## Optional mod compatibility for Factorio 2.0
+## Optional mod compatibility for Factorio 2.1
 
-The fork only lists optional dependencies that currently have Factorio 2.0 releases on the Mod Portal or are known 2.0 targets. Legacy 1.1-only optional dependencies were removed from `info.json` so the fork does not advertise compatibility with mods that are not available for Factorio 2.0.
+The fork only lists optional dependencies that currently have Factorio 2.1 releases on the Mod Portal or are known 2.1 targets. Legacy 1.1-only optional dependencies were removed from `info.json` so the fork does not advertise compatibility with mods that are not available for Factorio 2.1.
 
 Currently listed optional compatibility targets:
 
@@ -147,4 +147,4 @@ Currently listed optional compatibility targets:
 - RenaiTransportation / VehicleWagon2 / cargo-ships
 - creative-mod
 
-Removed legacy optional dependencies include old 1.1-only train mods such as FARL, ElectricTrain, Battle_Locomotives, old Angel train add-ons, TrainOverhaul, SmartTrains, RailPowerSystem, JunkTrain3, Transport_Drones, Bio_Industries, and similar 1.1-only compatibility entries. Some harmless guarded legacy code may remain internally, but these mods are no longer advertised as supported dependencies for the Factorio 2.0 fork.
+Removed legacy optional dependencies include old 1.1-only train mods such as FARL, ElectricTrain, Battle_Locomotives, old Angel train add-ons, TrainOverhaul, SmartTrains, RailPowerSystem, JunkTrain3, Transport_Drones, Bio_Industries, and similar 1.1-only compatibility entries. Some harmless guarded legacy code may remain internally, but these mods are no longer advertised as supported dependencies for the Factorio 2.1 fork.

@@ -15,7 +15,7 @@ local function getEntity4WayDirection(entity)
      direction == defines.direction.west then
     return direction
   end
-  return LSlib.utils.directions.orientationTo4WayDirection(entity and entity.orientation or 0)
+  return FLib.utils.directions.orientationTo4WayDirection(entity and entity.orientation or 0)
 end
 
 --------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ function Trainassembly:saveNewStructure(machineEntity, machineRenderID)
     ["entity"           ] = machineEntity,           -- the entity
     ["renderID"         ] = machineRenderID,         -- the renders of the building
     ["direction"        ] = machineEntity.direction, -- the direction its facing
-    ["trainColor"       ] = LSlib.utils.table.convertRGBA{r = 234, g = 17, b = 0}, -- the color of the train entity when it will be created
+    ["trainColor"       ] = FLib.utils.table.convertRGBA{r = 234, g = 17, b = 0}, -- the color of the train entity when it will be created
     ["pendingQuality"   ] = "normal",                -- quality of the next train entity to create
     ["createdEntity"    ] = nil,                     -- the created train entity from this building
     ["trainBuilderIndex"] = nil,                     -- the trainBuilder it belongs to (see further down)
@@ -159,7 +159,7 @@ function Trainassembly:saveNewStructure(machineEntity, machineRenderID)
 
   -- find_entities_filtered returns a list, we want only the entity,
   -- so we get it out of the table. Also make sure it is valid
-  if not LSlib.utils.table.isEmpty(trainAssemblerNW) then
+  if not FLib.utils.table.isEmpty(trainAssemblerNW) then
     trainAssemblerNW = trainAssemblerNW[1]
     if not trainAssemblerNW.valid then
       trainAssemblerNW = nil
@@ -167,7 +167,7 @@ function Trainassembly:saveNewStructure(machineEntity, machineRenderID)
   else
     trainAssemblerNW = nil
   end
-  if not LSlib.utils.table.isEmpty(trainAssemblerSE) then
+  if not FLib.utils.table.isEmpty(trainAssemblerSE) then
     trainAssemblerSE = trainAssemblerSE[1]
     if not trainAssemblerSE.valid then
       trainAssemblerSE = nil
@@ -182,14 +182,14 @@ function Trainassembly:saveNewStructure(machineEntity, machineRenderID)
   if trainAssemblerNW and trainAssemblerNW.valid then
     -- Check if its facing the same or oposite direction, if not, discard.
     if not (trainAssemblerNW.direction == machineEntity.direction
-            or trainAssemblerNW.direction == LSlib.utils.directions.oposite(machineEntity.direction) ) then
+            or trainAssemblerNW.direction == FLib.utils.directions.oposite(machineEntity.direction) ) then
       trainAssemblerNW = nil
     end
   end
   if trainAssemblerSE and trainAssemblerSE.valid then
     -- Check if its facing the same or oposite direction, if not, discard.
     if not (trainAssemblerSE.direction == machineEntity.direction
-            or trainAssemblerSE.direction == LSlib.utils.directions.oposite(machineEntity.direction) ) then
+            or trainAssemblerSE.direction == FLib.utils.directions.oposite(machineEntity.direction) ) then
       trainAssemblerSE = nil
     end
   end
@@ -366,7 +366,7 @@ function Trainassembly:deleteBuilding(machineEntity)
 
   -- find_entities_filtered returns a list, we want only the entity,
   -- so we get it out of the table. Also make sure it is valid
-  if not LSlib.utils.table.isEmpty(trainAssemblerNW) then
+  if not FLib.utils.table.isEmpty(trainAssemblerNW) then
     trainAssemblerNW = trainAssemblerNW[1]
     if not trainAssemblerNW.valid then
       trainAssemblerNW = nil
@@ -374,7 +374,7 @@ function Trainassembly:deleteBuilding(machineEntity)
   else
     trainAssemblerNW = nil
   end
-  if not LSlib.utils.table.isEmpty(trainAssemblerSE) then
+  if not FLib.utils.table.isEmpty(trainAssemblerSE) then
     trainAssemblerSE = trainAssemblerSE[1]
     if not trainAssemblerSE.valid then
       trainAssemblerSE = nil
@@ -389,14 +389,14 @@ function Trainassembly:deleteBuilding(machineEntity)
   if trainAssemblerNW and trainAssemblerNW.valid then
     -- Check if its facing the same or oposite direction, if not, discard.
     if not (trainAssemblerNW.direction == machineEntity.direction
-            or trainAssemblerNW.direction == LSlib.utils.directions.oposite(machineEntity.direction) ) then
+            or trainAssemblerNW.direction == FLib.utils.directions.oposite(machineEntity.direction) ) then
       trainAssemblerNW = nil
     end
   end
   if trainAssemblerSE and trainAssemblerSE.valid then
     -- Check if its facing the same or oposite direction, if not, discard.
     if not (trainAssemblerSE.direction == machineEntity.direction
-            or trainAssemblerSE.direction == LSlib.utils.directions.oposite(machineEntity.direction) ) then
+            or trainAssemblerSE.direction == FLib.utils.directions.oposite(machineEntity.direction) ) then
       trainAssemblerSE = nil
     end
   end
@@ -483,10 +483,10 @@ function Trainassembly:deleteBuilding(machineEntity)
   -- STEP 3: Deleting the trainAssembler
   storage.TA_data["trainAssemblers"][machineSurface.index][machinePosition.y][machinePosition.x] = nil
 
-  if LSlib.utils.table.isEmpty(storage.TA_data["trainAssemblers"][machineSurface.index][machinePosition.y]) then
+  if FLib.utils.table.isEmpty(storage.TA_data["trainAssemblers"][machineSurface.index][machinePosition.y]) then
     storage.TA_data["trainAssemblers"][machineSurface.index][machinePosition.y] = nil
 
-    if LSlib.utils.table.isEmpty(storage.TA_data["trainAssemblers"][machineSurface.index]) then
+    if FLib.utils.table.isEmpty(storage.TA_data["trainAssemblers"][machineSurface.index]) then
       storage.TA_data["trainAssemblers"][machineSurface.index] = nil
     end
   end
@@ -1015,7 +1015,7 @@ function Trainassembly:checkValidPlacement(createdEntity, playerIndex)
 
   local entitySurface = createdEntity.surface
   local entityDirection = getEntity4WayDirection(createdEntity)
-  local entityOpositeDirection = LSlib.utils.directions.oposite(entityDirection)
+  local entityOpositeDirection = FLib.utils.directions.oposite(entityDirection)
 
   -- STEP 1: check the rails underneath. The 1.1 version relied on the
   -- temporary locomotive prototype being rail-only-placeable. In Factorio 2.0
@@ -1204,7 +1204,7 @@ function Trainassembly:onBuildEntity(createdEntity, playerIndex)
         },
       }) do
         railEntity.destructible = false -- entity can't be damaged
-        railEntity.minable      = true  -- keep blueprintable; rail removal is handled at runtime
+        railEntity.minable_flag      = true  -- keep blueprintable; rail removal is handled at runtime
       end
 
       local machineRenderID = {}
@@ -1216,7 +1216,7 @@ function Trainassembly:onBuildEntity(createdEntity, playerIndex)
         ["overlay"] = "item-in-inserter-hand"
       } do
         machineRenderID[animationLayer] = rendering.draw_animation{
-          animation = machineEntity.name .. "-" .. LSlib.utils.directions.toString(machineEntity.direction) .. "-" .. animationLayer,
+          animation = machineEntity.name .. "-" .. FLib.utils.directions.toString(machineEntity.direction) .. "-" .. animationLayer,
           render_layer = renderLayer,
           target = machineEntity,
           surface = machineEntity.surface,
@@ -1243,7 +1243,7 @@ function Trainassembly:onBuildEntity(createdEntity, playerIndex)
       -- rail and protect it instead of destroying it; otherwise blueprints miss
       -- the short rail pieces between/under builders.
       createdEntity.destructible = false
-      createdEntity.minable = true -- keep rails blueprintable
+      createdEntity.minable_flag = true -- keep rails blueprintable
       if Traincontroller and Traincontroller.processPendingControllers then
         Traincontroller:processPendingControllers()
       end
@@ -1291,7 +1291,7 @@ function Trainassembly:onRemoveEntity(removedEntity)
       },
     }) do
       railEntity.destructible = true -- entity can be damaged
-      railEntity.minable      = true -- entity can be mined
+      railEntity.minable_flag      = true -- entity can be mined
     end
 
     -- STEP 3: Update the data structure
@@ -1331,7 +1331,7 @@ function Trainassembly:onGhostBuild(removedEntityPrototype, ghostEntity)
   -- replace it.
   if ghostEntity and removedEntityPrototype.name == self:getMachineEntityName() then
     rendering.draw_animation{
-      animation = removedEntityPrototype.name .. "-" .. LSlib.utils.directions.toString(ghostEntity.direction),
+      animation = removedEntityPrototype.name .. "-" .. FLib.utils.directions.toString(ghostEntity.direction),
       tint = {r = 0.6, g = 0.6, b = 0.6, a = 0.3}, -- utility constant ghost_tint
       render_layer = "object",
       target = ghostEntity,
@@ -1350,7 +1350,7 @@ function Trainassembly:onPlayerRotatedEntity(rotatedEntity)
   -- Player experience: The player thinks he rotated the entity 180 degree
   if rotatedEntity.name == self:getMachineEntityName() then
     -- STEP 1: get the new direction from the old saved direction
-    local newDirection = LSlib.utils.directions.oposite(self:getMachineDirection(rotatedEntity))
+    local newDirection = FLib.utils.directions.oposite(self:getMachineDirection(rotatedEntity))
 
     -- STEP 2: set the new rotated direction
     local renderIDs = self:getMachineRenderIDs(rotatedEntity)
@@ -1358,7 +1358,7 @@ function Trainassembly:onPlayerRotatedEntity(rotatedEntity)
     if renderIDs then
       for _,animationLayer in pairs{"base", "overlay"} do
         if renderIDs[animationLayer] then
-          compat.set_render_animation(renderIDs[animationLayer], rotatedEntity.name .. "-" .. LSlib.utils.directions.toString(newDirection) .. "-" .. animationLayer)
+          compat.set_render_animation(renderIDs[animationLayer], rotatedEntity.name .. "-" .. FLib.utils.directions.toString(newDirection) .. "-" .. animationLayer)
         end
       end
     end

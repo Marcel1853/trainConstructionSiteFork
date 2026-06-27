@@ -312,7 +312,8 @@ function Traincontroller.Builder:buildNextTrain(trainBuilderIndex)
         -- there was no entity, or the already existing entity got removed above this code
 
         -- first we need to check if the recipe has made a result
-        local machineOutput = machineEntity.fluidbox[1]
+        -- Factorio 2.1: fluidbox property removed; use get_fluid(index) instead
+        local machineOutput = machineEntity.get_fluid(1)
         if machineOutput and machineOutput.amount >= 1 then
           local machineDirection = Trainassembly:getMachineDirection(machineEntity)
 
@@ -325,13 +326,13 @@ function Traincontroller.Builder:buildNextTrain(trainBuilderIndex)
             force              = machineEntity.force,
             snap_to_train_stop = false,
           }
-          if createdEntity and (not LSlib.utils.table.areEqual(createdEntity.position, builderLocation["position"])) then
+          if createdEntity and (not FLib.utils.table.areEqual(createdEntity.position, builderLocation["position"])) then
             -- it snapped to a train stop probably, so let us build it in reverse first
             createdEntity.destroy()
             createdEntity = game.surfaces[builderLocation["surfaceIndex"]].create_entity {
               name               = buildEntityName,
               position           = builderLocation["position"],
-              direction          = LSlib.utils.directions.oposite(machineDirection),
+              direction          = FLib.utils.directions.oposite(machineDirection),
               quality            = pendingQuality,
               force              = machineEntity.force,
               snap_to_train_stop = false,
@@ -381,8 +382,8 @@ function Traincontroller.Builder:buildNextTrain(trainBuilderIndex)
             Trainassembly:setPendingQuality(machineEntity, "normal")
 
             -- now substract one result from the assembler
-            machineOutput.amount = machineOutput.amount - 1
-            machineEntity.fluidbox[1] = machineOutput.amount > 0 and machineOutput or nil
+            -- Factorio 2.1: remove_fluid(index, amount) removes from fluidbox at index
+            machineEntity.remove_fluid(1, 1)
 
             -- now that we finised this one, we can raise the event for other mods
             script.raise_event(defines.events.script_raised_built, {
@@ -500,7 +501,7 @@ function Traincontroller.Builder:onTick(event)
   self:updateController(surfaceIndex, position)
 
   -- Increment the nextController
-  if LSlib.utils.table.areEqual(controller, storage.TC_data["nextTrainControllerIterate"]) then
+  if FLib.utils.table.areEqual(controller, storage.TC_data["nextTrainControllerIterate"]) then
     storage.TC_data["nextTrainControllerIterate"] = nextController
   end
 end

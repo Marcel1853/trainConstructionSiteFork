@@ -37,7 +37,7 @@ for _, trainType in pairs(trainRecipe.train_types) do
           type = "recipe",
           name = fluidRecipeName,
           localised_name = getTrainRecipeLocalisedName(item, trainEntity),
-          category = "trainassembling",
+          categories = {"trainassembling"},
           enabled = false,
           energy_required = 15,
           ingredients =
@@ -73,9 +73,9 @@ for _, trainType in pairs(trainRecipe.train_types) do
           data.raw.recipe[recipeName].icon_mipmaps = nil
           data.raw.recipe[recipeName].icons = nil
         end
-        LSlib.recipe.setLocalisedName(recipeName, util.table.deepcopy(item.localised_name))
-        LSlib.recipe.setMainResult(recipeName, itemName)
-        LSlib.recipe.setShowProduct(recipeName, true)
+        FLib.recipe.setLocalisedName(recipeName, util.table.deepcopy(item.localised_name))
+        FLib.recipe.setMainResult(recipeName, itemName)
+        FLib.recipe.setShowProduct(recipeName, true)
       end
     end
   end
@@ -87,7 +87,7 @@ if data.raw["item-with-entity-data"]["locomotive-manual-build"] then
     type = "recipe",
     name = "locomotive-manual-build",
     localised_name = {"entity-name.locomotive"},
-    category = "manual-crafting",
+    categories = {"manual-crafting"},
     enabled = false,
     energy_required = 5,
     always_show_made_in = true,

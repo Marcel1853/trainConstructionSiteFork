@@ -1,7 +1,7 @@
 {
   "runtime.version": "Lua 5.2",
   "diagnostics.globals": [
-    "LSlib",
+    "FLib",
     "aai_processed_fuel_ignore",
     "angelsmods",
     "appmod",

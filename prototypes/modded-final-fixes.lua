@@ -26,71 +26,71 @@ local function safe_call(label, fn, ...)
   return ok
 end
 
-local _TCS_recipe_removeIngredient = LSlib.recipe.removeIngredient
-LSlib.recipe.removeIngredient = function(recipe_name, ingredient_name)
+local _TCS_recipe_removeIngredient = FLib.recipe.removeIngredient
+FLib.recipe.removeIngredient = function(recipe_name, ingredient_name)
   if recipe_exists(recipe_name) then
     return safe_call("recipe.removeIngredient " .. tostring(recipe_name), _TCS_recipe_removeIngredient, recipe_name, ingredient_name)
   end
 end
 
-local _TCS_recipe_addIngredient = LSlib.recipe.addIngredient
-LSlib.recipe.addIngredient = function(recipe_name, ingredient_name, amount)
+local _TCS_recipe_addIngredient = FLib.recipe.addIngredient
+FLib.recipe.addIngredient = function(recipe_name, ingredient_name, amount)
   if recipe_exists(recipe_name) then
     return safe_call("recipe.addIngredient " .. tostring(recipe_name), _TCS_recipe_addIngredient, recipe_name, ingredient_name, amount)
   end
 end
 
-local _TCS_recipe_disable = LSlib.recipe.disable
-LSlib.recipe.disable = function(recipe_name)
+local _TCS_recipe_disable = FLib.recipe.disable
+FLib.recipe.disable = function(recipe_name)
   if recipe_exists(recipe_name) then
     return safe_call("recipe.disable " .. tostring(recipe_name), _TCS_recipe_disable, recipe_name)
   end
 end
 
-local _TCS_technology_addRecipeUnlock = LSlib.technology.addRecipeUnlock
-LSlib.technology.addRecipeUnlock = function(technology_name, recipe_name)
+local _TCS_technology_addRecipeUnlock = FLib.technology.addRecipeUnlock
+FLib.technology.addRecipeUnlock = function(technology_name, recipe_name)
   if technology_exists(technology_name) and recipe_exists(recipe_name) then
     return safe_call("technology.addRecipeUnlock " .. tostring(technology_name), _TCS_technology_addRecipeUnlock, technology_name, recipe_name)
   end
 end
 
-local _TCS_technology_removePrerequisite = LSlib.technology.removePrerequisite
-LSlib.technology.removePrerequisite = function(technology_name, prerequisite_name)
+local _TCS_technology_removePrerequisite = FLib.technology.removePrerequisite
+FLib.technology.removePrerequisite = function(technology_name, prerequisite_name)
   if technology_exists(technology_name) then
     return safe_call("technology.removePrerequisite " .. tostring(technology_name), _TCS_technology_removePrerequisite, technology_name, prerequisite_name)
   end
 end
 
-local _TCS_technology_moveRecipeUnlock = LSlib.technology.moveRecipeUnlock
-LSlib.technology.moveRecipeUnlock = function(from_technology, to_technology, recipe_name)
+local _TCS_technology_moveRecipeUnlock = FLib.technology.moveRecipeUnlock
+FLib.technology.moveRecipeUnlock = function(from_technology, to_technology, recipe_name)
   if technology_exists(from_technology) and technology_exists(to_technology) and recipe_exists(recipe_name) then
     return safe_call("technology.moveRecipeUnlock " .. tostring(recipe_name), _TCS_technology_moveRecipeUnlock, from_technology, to_technology, recipe_name)
   end
 end
 
-local _TCS_technology_removeIngredient = LSlib.technology.removeIngredient
-LSlib.technology.removeIngredient = function(technology_name, ingredient_name)
+local _TCS_technology_removeIngredient = FLib.technology.removeIngredient
+FLib.technology.removeIngredient = function(technology_name, ingredient_name)
   if technology_exists(technology_name) then
     return safe_call("technology.removeIngredient " .. tostring(technology_name), _TCS_technology_removeIngredient, technology_name, ingredient_name)
   end
 end
 
-local _TCS_technology_addIngredient = LSlib.technology.addIngredient
-LSlib.technology.addIngredient = function(technology_name, amount, ingredient_name)
+local _TCS_technology_addIngredient = FLib.technology.addIngredient
+FLib.technology.addIngredient = function(technology_name, amount, ingredient_name)
   if technology_exists(technology_name) then
     return safe_call("technology.addIngredient " .. tostring(technology_name), _TCS_technology_addIngredient, technology_name, amount, ingredient_name)
   end
 end
 
-local _TCS_final_item_setSubgroup = LSlib.item.setSubgroup
-LSlib.item.setSubgroup = function(type_name, prototype_name, subgroup_name)
+local _TCS_final_item_setSubgroup = FLib.item.setSubgroup
+FLib.item.setSubgroup = function(type_name, prototype_name, subgroup_name)
   if prototype_exists(type_name, prototype_name) and data.raw["item-subgroup"] and data.raw["item-subgroup"][subgroup_name] then
     return safe_call("item.setSubgroup " .. tostring(type_name) .. "/" .. tostring(prototype_name), _TCS_final_item_setSubgroup, type_name, prototype_name, subgroup_name)
   end
 end
 
-local _TCS_final_item_setOrderstring = LSlib.item.setOrderstring
-LSlib.item.setOrderstring = function(type_name, prototype_name, order_string)
+local _TCS_final_item_setOrderstring = FLib.item.setOrderstring
+FLib.item.setOrderstring = function(type_name, prototype_name, order_string)
   if prototype_exists(type_name, prototype_name) then
     return safe_call("item.setOrderstring " .. tostring(type_name) .. "/" .. tostring(prototype_name), _TCS_final_item_setOrderstring, type_name, prototype_name, order_string)
   end
@@ -184,14 +184,14 @@ end
 
 for trainType,trainData in pairs(trainConstructionSite.remoteData.electricTrains or {}) do
   for trainName,_ in pairs(trainData or {}) do
-    LSlib.recipe.removeIngredient(trainRecipe.make_name(trainName, trainType), trainfuel)
+    FLib.recipe.removeIngredient(trainRecipe.make_name(trainName, trainType), trainfuel)
   end
 end
 
 for trainType,trainData in pairs(trainConstructionSite.remoteData.customFuelTrains or {}) do
   for trainName,customFuelName in pairs(trainData or {}) do
-    LSlib.recipe.removeIngredient(trainRecipe.make_name(trainName, trainType), trainfuel)
-    LSlib.recipe.addIngredient(trainRecipe.make_name(trainName, trainType), customFuelName)
+    FLib.recipe.removeIngredient(trainRecipe.make_name(trainName, trainType), trainfuel)
+    FLib.recipe.addIngredient(trainRecipe.make_name(trainName, trainType), customFuelName)
   end
 end
 
@@ -203,14 +203,14 @@ local collision_mask_util = require("collision-mask-util")
 
 if mods["FARL"] then
     if data.raw.technology["rail-signals"] then
-      LSlib.technology.removePrerequisite("rail-signals", "trainassembly-automated-train-assembling")
-      LSlib.technology.moveRecipeUnlock("rail-signals", "trainassembly-automated-train-assembling", "farl")
+      FLib.technology.removePrerequisite("rail-signals", "trainassembly-automated-train-assembling")
+      FLib.technology.moveRecipeUnlock("rail-signals", "trainassembly-automated-train-assembling", "farl")
     end
-    LSlib.technology.addRecipeUnlock("trainassembly-automated-train-assembling", trainRecipe.make_name("farl", "locomotive"))
+    FLib.technology.addRecipeUnlock("trainassembly-automated-train-assembling", trainRecipe.make_name("farl", "locomotive"))
 end
 
 if mods["TrainOverhaul"] then
-  LSlib.technology.addRecipeUnlock("nuclear-locomotive", trainRecipe.make_name("nuclear-locomotive", "locomotive"))
+  FLib.technology.addRecipeUnlock("nuclear-locomotive", trainRecipe.make_name("nuclear-locomotive", "locomotive"))
 end
 
 if mods["MultipleUnitTrainControl"] then
@@ -220,7 +220,7 @@ if mods["MultipleUnitTrainControl"] then
       if recipe then recipe.allow_as_intermediate = false end
 
       local item = data.raw["item"][locomotive] or data.raw["item-with-entity-data"][locomotive]
-      if item then LSlib.item.setHidden(item.type, locomotive) end
+      if item then FLib.item.setHidden(item.type, locomotive) end
     end
   end
 end
@@ -247,22 +247,22 @@ if mods["angelsindustries"] then
   end
 
   if settings.startup["angels-enable-tech"] and settings.startup["angels-enable-tech"].value then
-    LSlib.technology.removeIngredient("trainfuel-wood-pellets", "datacore-processing-1")
-    LSlib.technology.removeIngredient("trainfuel-coal-crushed", "datacore-processing-1")
-    LSlib.technology.removeIngredient("trainfuel-solid-coke", "datacore-processing-1")
-    LSlib.technology.removeIngredient("trainfuel-solid-carbon", "datacore-processing-1")
-    LSlib.technology.removeIngredient("trainfuel-wood-charcoal", "datacore-processing-1")
-    LSlib.technology.removeIngredient("trainfuel-rocket-booster", "datacore-processing-1")
-    LSlib.technology.removeIngredient("trainfuel-wood-bricks", "datacore-processing-1")
-    LSlib.technology.removeIngredient("trainfuel-pellet-coke", "datacore-processing-1")
-    LSlib.technology.addIngredient("trainfuel-rocket-booster", 1, "datacore-logistic-1")
+    FLib.technology.removeIngredient("trainfuel-wood-pellets", "datacore-processing-1")
+    FLib.technology.removeIngredient("trainfuel-coal-crushed", "datacore-processing-1")
+    FLib.technology.removeIngredient("trainfuel-solid-coke", "datacore-processing-1")
+    FLib.technology.removeIngredient("trainfuel-solid-carbon", "datacore-processing-1")
+    FLib.technology.removeIngredient("trainfuel-wood-charcoal", "datacore-processing-1")
+    FLib.technology.removeIngredient("trainfuel-rocket-booster", "datacore-processing-1")
+    FLib.technology.removeIngredient("trainfuel-wood-bricks", "datacore-processing-1")
+    FLib.technology.removeIngredient("trainfuel-pellet-coke", "datacore-processing-1")
+    FLib.technology.addIngredient("trainfuel-rocket-booster", 1, "datacore-logistic-1")
   end
 end
 
 if mods["Krastorio2"] then
   -- nuclear locomotive technology is not available in data update stage, custom fixing it here
-  LSlib.technology.addRecipeUnlock("kr-nuclear-locomotive", trainRecipe.make_name("kr-nuclear-locomotive", "locomotive"))
-  LSlib.recipe.disable(trainRecipe.make_name("kr-nuclear-locomotive", "locomotive"))
+  FLib.technology.addRecipeUnlock("kr-nuclear-locomotive", trainRecipe.make_name("kr-nuclear-locomotive", "locomotive"))
+  FLib.recipe.disable(trainRecipe.make_name("kr-nuclear-locomotive", "locomotive"))
 end
 
 if mods["space-exploration"] then
@@ -274,24 +274,34 @@ if mods["space-exploration"] then
     {"artillery-wagon", "artillery-wagon"}
   } do
     if itemOrder[trainData[1] or ""] and itemOrder[trainData[1] or ""][trainData[2] or ""] then
-      LSlib.item.setSubgroup("item-with-entity-data", trainData[2] or "", "transport")
-      LSlib.item.setOrderstring("item-with-entity-data", trainData[2] or "", itemOrder[trainData[1] or ""][trainData[2] or ""])
+      FLib.item.setSubgroup("item-with-entity-data", trainData[2] or "", "transport")
+      FLib.item.setOrderstring("item-with-entity-data", trainData[2] or "", itemOrder[trainData[1] or ""][trainData[2] or ""])
     end
   end
 
   -- space exploration moves rail stuff around... fixing it here
-  LSlib.item.setSubgroup("rail-planner", "rail", "transport-railway")
-  LSlib.item.setOrderstring("rail-planner", "rail", "a[rail]-a[stone]")
-  LSlib.item.setSubgroup("rail-planner", "se-space-rail", "transport-railway")
-  LSlib.item.setOrderstring("rail-planner", "se-space-rail", "a[rail]-b[space]")
+  FLib.item.setSubgroup("rail-planner", "rail", "transport-railway")
+  FLib.item.setOrderstring("rail-planner", "rail", "a[rail]-a[stone]")
+  FLib.item.setSubgroup("rail-planner", "se-space-rail", "transport-railway")
+  FLib.item.setOrderstring("rail-planner", "se-space-rail", "a[rail]-b[space]")
 
-  LSlib.item.setSubgroup("item", "train-stop", "transport-railway")
-  LSlib.item.setOrderstring("item", "train-stop", "b[stop]-a[regular]")
+  FLib.item.setSubgroup("item", "train-stop", "transport-railway")
+  FLib.item.setOrderstring("item", "train-stop", "b[stop]-a[regular]")
 
-  LSlib.item.setSubgroup("item", "rail-signal", "transport-railway")
-  LSlib.item.setOrderstring("item", "rail-signal", "c[signal]-a[rail]")
-  LSlib.item.setSubgroup("item", "rail-chain-signal", "transport-railway")
-  LSlib.item.setOrderstring("item", "rail-chain-signal", "c[signal]-b[chain]")
+  FLib.item.setSubgroup("item", "rail-signal", "transport-railway")
+  FLib.item.setOrderstring("item", "rail-signal", "c[signal]-a[rail]")
+  FLib.item.setSubgroup("item", "rail-chain-signal", "transport-railway")
+  FLib.item.setOrderstring("item", "rail-chain-signal", "c[signal]-b[chain]")
+
+  -- Factorio 2.1: elevated rail items (rail-ramp, rail-support-foundation)
+  if data.raw["rail-planner"] and data.raw["rail-planner"]["rail-ramp"] then
+    FLib.item.setSubgroup("rail-planner", "rail-ramp", "transport-railway")
+    FLib.item.setOrderstring("rail-planner", "rail-ramp", "a[rail]-c[ramp]")
+  end
+  if data.raw["item"] and data.raw["item"]["rail-support"] then
+    FLib.item.setSubgroup("item", "rail-support", "transport-railway")
+    FLib.item.setOrderstring("item", "rail-support", "a[rail]-d[support]")
+  end
 end
 
 -- Cargo ships change the order to fit in Transport Logistics instead of Logistics

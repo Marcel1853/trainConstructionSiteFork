@@ -41,7 +41,7 @@ function Traincontroller.Gui:initPrototypeData()
     "traincontroller-tab-selection" ,
     "traincontroller-tab-statistics",
   } do
-    tabButtonPath[tabButtonName] = LSlib.gui.layout.getElementPath(trainControllerGui, tabButtonName)
+    tabButtonPath[tabButtonName] = FLib.gui.layout.getElementPath(trainControllerGui, tabButtonName)
   end
 
   -- updateElementPath
@@ -50,7 +50,7 @@ function Traincontroller.Gui:initPrototypeData()
     "selected-depot-name", -- current/new depot name
     "selected-depot-list", -- list of all depot names
   } do
-    updateElementPath[selectionTabElementName] = LSlib.gui.layout.getElementPath(trainControllerGui, selectionTabElementName)
+    updateElementPath[selectionTabElementName] = FLib.gui.layout.getElementPath(trainControllerGui, selectionTabElementName)
   end
   for _,statisticsTabElementName in pairs{
     "statistics-station-id-value"                , -- controller name
@@ -61,7 +61,7 @@ function Traincontroller.Gui:initPrototypeData()
     "traincontroller-color-picker"               , -- color picking frame
     "traincontroller-color-picker-entity-preview", -- color picker entity preview
   } do
-    updateElementPath[statisticsTabElementName] = LSlib.gui.layout.getElementPath(trainControllerGui, statisticsTabElementName)
+    updateElementPath[statisticsTabElementName] = FLib.gui.layout.getElementPath(trainControllerGui, statisticsTabElementName)
   end
 
   return {
@@ -205,7 +205,7 @@ function Traincontroller.Gui:initClickHandlers()
   ------------------------------------------------------------------------------
   clickHandlers["statistics-station-id-edit"] = function(clickedElement, playerIndex)
     local tabToOpen = "traincontroller-tab-selection"
-    Traincontroller.Gui:getClickHandler(tabToOpen)(LSlib.gui.getElement(playerIndex, Traincontroller.Gui:getTabElementPath(tabToOpen)), playerIndex) -- mimic tab pressed
+    Traincontroller.Gui:getClickHandler(tabToOpen)(FLib.gui.getElement(playerIndex, Traincontroller.Gui:getTabElementPath(tabToOpen)), playerIndex) -- mimic tab pressed
   end
 
 
@@ -247,7 +247,7 @@ function Traincontroller.Gui:initClickHandlers()
 
   clickHandlers["statistics-builder-configuration-button-color"] = function(clickedElement, playerIndex)
     local clickedElementStyle = "traincontroller_color_indicator_button_housing"
-    local colorPickerFrame = LSlib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("traincontroller-color-picker"))
+    local colorPickerFrame = FLib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("traincontroller-color-picker"))
 
     if clickedElement.style.name == clickedElementStyle then
       if colorPickerFrame.visible then
@@ -288,7 +288,7 @@ function Traincontroller.Gui:initClickHandlers()
         }
         entityPreviewEntity.color = {r=color.r, g=color.g, b=color.b, a = 127/255}
 
-        local previewElement = LSlib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("traincontroller-color-picker-entity-preview"))
+        local previewElement = FLib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("traincontroller-color-picker-entity-preview"))
         previewElement.entity = entityPreviewEntity
       else
         game.print(string.format("entity preview for %q could not be added at position {%i, %i}",
@@ -310,7 +310,7 @@ function Traincontroller.Gui:initClickHandlers()
   clickHandlers["traincontroller-color-picker-button-discard"] = function(clickedElement, playerIndex)
 
     -- STEP 1: set color picker hidden
-    LSlib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("traincontroller-color-picker")).visible = false
+    FLib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("traincontroller-color-picker")).visible = false
 
     -- also remove the entity-preview entity
     local entityRadius = 10
@@ -329,7 +329,7 @@ function Traincontroller.Gui:initClickHandlers()
     -- STEP 2: find the selected one
     local clickedElementStyle        = "traincontroller_color_indicator_button_housing"
     local clickedElementPressedStyle = clickedElementStyle.."_pressed"
-    local configurationElement = LSlib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("statistics-builder-configuration-flow"))
+    local configurationElement = FLib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("statistics-builder-configuration-flow"))
 
     for _, assemblerElementIndex in pairs(configurationElement.children_names) do
       local colorElement = configurationElement[assemblerElementIndex]["statistics-builder-configuration-button-color"]
@@ -355,7 +355,7 @@ function Traincontroller.Gui:initClickHandlers()
   clickHandlers["traincontroller-color-picker-button-confirm"] = function(clickedElement, playerIndex)
 
     -- STEP 1: set color picker hidden
-    LSlib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("traincontroller-color-picker")).visible = false
+    FLib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("traincontroller-color-picker")).visible = false
 
     -- also remove the entity-preview entity
     local entityRadius = 10
@@ -371,7 +371,7 @@ function Traincontroller.Gui:initClickHandlers()
     -- STEP 2: find the selected one
     local clickedElementStyle        = "traincontroller_color_indicator_button_housing"
     local clickedElementPressedStyle = clickedElementStyle.."_pressed"
-    local configurationElement = LSlib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("statistics-builder-configuration-flow"))
+    local configurationElement = FLib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("statistics-builder-configuration-flow"))
 
     for _, assemblerElementIndex in pairs(configurationElement.children_names) do
       local colorElement = configurationElement[assemblerElementIndex]["statistics-builder-configuration-button-color"]
@@ -441,7 +441,7 @@ function Traincontroller.Gui:initClickHandlers()
       -- STEP3: update the color button
       local clickedElementStyle        = "traincontroller_color_indicator_button_housing"
       local clickedElementPressedStyle = clickedElementStyle.."_pressed"
-      local configurationElement = LSlib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("statistics-builder-configuration-flow"))
+      local configurationElement = FLib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("statistics-builder-configuration-flow"))
 
       local color
       for _, assemblerElementIndex in pairs(configurationElement.children_names) do
@@ -496,7 +496,7 @@ function Traincontroller.Gui:initClickHandlers()
     -- STEP 2: update the color button
     local clickedElementStyle        = "traincontroller_color_indicator_button_housing"
     local clickedElementPressedStyle = clickedElementStyle.."_pressed"
-    local configurationElement = LSlib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("statistics-builder-configuration-flow"))
+    local configurationElement = FLib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("statistics-builder-configuration-flow"))
 
     local color
     for _, assemblerElementIndex in pairs(configurationElement.children_names) do
@@ -538,9 +538,9 @@ function Traincontroller.Gui:initClickHandlers()
   -- select train depot name
   ------------------------------------------------------------------------------
   clickHandlers["selected-depot-list"] = function(clickedElement, playerIndex)
-    local listboxElement = LSlib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("selected-depot-list"))
+    local listboxElement = FLib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("selected-depot-list"))
 
-    LSlib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("selected-depot-name")).caption = listboxElement.get_item(listboxElement.selected_index)
+    FLib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("selected-depot-name")).caption = listboxElement.get_item(listboxElement.selected_index)
   end
 
 
@@ -549,7 +549,7 @@ function Traincontroller.Gui:initClickHandlers()
     local controllerEntity  = Traincontroller.Gui:getOpenedControllerEntity(playerIndex)
     if not (controllerEntity and controllerEntity.valid) then return end
     local oldControllerName = controllerEntity.backer_name
-    local newControllerName = LSlib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("selected-depot-name")).caption
+    local newControllerName = FLib.gui.getElement(playerIndex, Traincontroller.Gui:getUpdateElementPath("selected-depot-name")).caption
 
     if newControllerName ~= oldControllerName then
       controllerEntity.backer_name = newControllerName -- invokes the rename event which will update UI's
@@ -558,7 +558,7 @@ function Traincontroller.Gui:initClickHandlers()
 
     -- mimic tab pressed to go back to statistics tab
     local tabToOpen = "traincontroller-tab-statistics"
-    Traincontroller.Gui:getClickHandler(tabToOpen)(LSlib.gui.getElement(playerIndex, Traincontroller.Gui:getTabElementPath(tabToOpen)), playerIndex)
+    Traincontroller.Gui:getClickHandler(tabToOpen)(FLib.gui.getElement(playerIndex, Traincontroller.Gui:getTabElementPath(tabToOpen)), playerIndex)
   end
 
 
@@ -635,7 +635,7 @@ end
 
 
 function Traincontroller.Gui:getGuiName()
-  return LSlib.gui.getRootElementName(self:getControllerGuiLayout())
+  return FLib.gui.getRootElementName(self:getControllerGuiLayout())
 end
 
 
@@ -698,7 +698,7 @@ function Traincontroller.Gui:createGui(playerIndex)
   -- Refresh cached layout data so saves created with older port builds don't keep
   -- removed Factorio 2.0 utility sprites such as utility/close_white.
   storage.TC_data.Gui["prototypeData"] = self:initPrototypeData()
-  local trainDepoGui = LSlib.gui.create(playerIndex, self:getControllerGuiLayout())
+  local trainDepoGui = FLib.gui.create(playerIndex, self:getControllerGuiLayout())
   self:updateGuiInfo(playerIndex)
   return trainDepoGui
 end
@@ -707,19 +707,19 @@ end
 
 function Traincontroller.Gui:destroyGui(playerIndex)
   -- make sure the color picker is closed first
-  local colorPickerElement = LSlib.gui.getElement(playerIndex, self:getUpdateElementPath("traincontroller-color-picker"))
+  local colorPickerElement = FLib.gui.getElement(playerIndex, self:getUpdateElementPath("traincontroller-color-picker"))
   if colorPickerElement and colorPickerElement.visible then
     -- simulate clicking discard
     self:getClickHandler("traincontroller-color-picker-button-discard")(nil, playerIndex)
   end
-  return LSlib.gui.destroy(playerIndex, self:getControllerGuiLayout())
+  return FLib.gui.destroy(playerIndex, self:getControllerGuiLayout())
 end
 
 
 
 function Traincontroller.Gui:updateGuiInfo(playerIndex)
   -- We expect the gui to be created already
-  local trainDepotGui = LSlib.gui.getElement(playerIndex, LSlib.gui.layout.getElementPath(self:getControllerGuiLayout(), self:getGuiName()))
+  local trainDepotGui = FLib.gui.getElement(playerIndex, FLib.gui.layout.getElementPath(self:getControllerGuiLayout(), self:getGuiName()))
   if not trainDepotGui then return end -- gui was not created, nothing to update
 
   -- data from the traindepo we require to update
@@ -742,21 +742,21 @@ function Traincontroller.Gui:updateGuiInfo(playerIndex)
 
   -- statistics ----------------------------------------------------------------
   -- controller depot name
-  LSlib.gui.getElement(playerIndex, self:getUpdateElementPath("statistics-station-id-value")).caption = controllerName
+  FLib.gui.getElement(playerIndex, self:getUpdateElementPath("statistics-station-id-value")).caption = controllerName
 
   -- requested amount of trains in depot
-  LSlib.gui.getElement(playerIndex, self:getUpdateElementPath("statistics-depot-request-value")).caption = string.format(
+  FLib.gui.getElement(playerIndex, self:getUpdateElementPath("statistics-depot-request-value")).caption = string.format(
     "%i/%i", depotTrainCount, depotRequestCount)
 
   -- status of the builder
-  LSlib.gui.getElement(playerIndex, self:getUpdateElementPath("statistics-builder-status-value")).caption = self:getOpenedControllerStatusString(playerIndex)
+  FLib.gui.getElement(playerIndex, self:getUpdateElementPath("statistics-builder-status-value")).caption = self:getOpenedControllerStatusString(playerIndex)
 
   -- configuration
-  local configurationElement = LSlib.gui.getElement(playerIndex, self:getUpdateElementPath("statistics-builder-configuration-flow"))
+  local configurationElement = FLib.gui.getElement(playerIndex, self:getUpdateElementPath("statistics-builder-configuration-flow"))
 
   local colorPickerSelectedIndex -- extract the selected element first, required for the color picker
   local configurationElementCount = #configurationElement.children_names
-  local colorPickerFrame = LSlib.gui.getElement(playerIndex, self:getUpdateElementPath("traincontroller-color-picker"))
+  local colorPickerFrame = FLib.gui.getElement(playerIndex, self:getUpdateElementPath("traincontroller-color-picker"))
   local clickedElementStyle        = "traincontroller_color_indicator_button_housing"
   local clickedElementPressedStyle = clickedElementStyle.."_pressed"
 
@@ -842,14 +842,14 @@ function Traincontroller.Gui:updateGuiInfo(playerIndex)
 
 
   -- select depot name ---------------------------------------------------------
-  LSlib.gui.getElement(playerIndex, self:getUpdateElementPath("selected-depot-name")).caption = controllerName
+  FLib.gui.getElement(playerIndex, self:getUpdateElementPath("selected-depot-name")).caption = controllerName
 
   -- name selection list
-  local depotEntriesList = LSlib.gui.getElement(playerIndex, self:getUpdateElementPath("selected-depot-list"))
+  local depotEntriesList = FLib.gui.getElement(playerIndex, self:getUpdateElementPath("selected-depot-list"))
   depotEntriesList.clear_items()
 
   local itemIndex = 1
-  local orderedPairs = LSlib.utils.table.orderedPairs
+  local orderedPairs = FLib.utils.table.orderedPairs
   for trainDepotName,_ in orderedPairs(Traindepot:getDepotData(depotForceName, controllerSurfaceIndex)) do
     -- https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add_item
     depotEntriesList.add_item(trainDepotName)

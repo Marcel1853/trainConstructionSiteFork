@@ -27,7 +27,7 @@ data:extend{ -- add fuel recipe to tech tree
     name = "trainfuel-2",
     localised_name = {"technology-name.trainfuel", "trainassemblyfuel", "coal"},
     localised_description = {"technology-description.trainfuel", "trainassemblyfuel", "coal"},
-    icons = LSlib.recipe.getIcons("trainassembly-trainfuel-coal"),
+    icons = FLib.recipe.getIcons("trainassembly-trainfuel-coal"),
     effects =
     {
       {
@@ -47,7 +47,7 @@ data:extend{ -- add fuel recipe to tech tree
     name = "trainfuel-3",
     localised_name = {"technology-name.trainfuel", "trainassemblyfuel", "solid-fuel"},
     localised_description = {"technology-description.trainfuel", "trainassemblyfuel", "solid-fuel"},
-    icons = LSlib.recipe.getIcons("trainassembly-trainfuel-solid-fuel"),
+    icons = FLib.recipe.getIcons("trainassembly-trainfuel-solid-fuel"),
     effects =
     {
       {
@@ -68,7 +68,7 @@ data:extend{ -- add fuel recipe to tech tree
     name = "trainfuel-4",
     localised_name = {"technology-name.trainfuel", "trainassemblyfuel", "rocket-fuel"},
     localised_description = {"technology-description.trainfuel", "trainassemblyfuel", "rocket-fuel"},
-    icons = LSlib.recipe.getIcons("trainassembly-trainfuel-rocket-fuel"),
+    icons = FLib.recipe.getIcons("trainassembly-trainfuel-rocket-fuel"),
     effects =
     {
       {
@@ -89,7 +89,7 @@ data:extend{ -- add fuel recipe to tech tree
     name = "trainfuel-5",
     localised_name = {"technology-name.trainfuel", "trainassemblyfuel", "nuclear-fuel"},
     localised_description = {"technology-description.trainfuel", "trainassemblyfuel", "nuclear-fuel"},
-    icons = LSlib.recipe.getIcons("trainassembly-trainfuel-nuclear-fuel"),
+    icons = FLib.recipe.getIcons("trainassembly-trainfuel-nuclear-fuel"),
     effects =
     {
       {

@@ -3,7 +3,7 @@ data:extend{
   {
     type = "recipe",
     name = "trainassembly",
-    category = "advanced-crafting",
+    categories = {"advanced-crafting"},
     enabled = false,
     energy_required = 30,
     ingredients =
