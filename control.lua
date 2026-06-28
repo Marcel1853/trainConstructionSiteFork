@@ -7,6 +7,7 @@ require "src.trainassembly"
 require "src.traincontroller"
 require "src.trainfuel"
 require "src.mod-compatibility"
+require "src.remote-interface"
 
 local onConfigChanges = require("src.mod-config")
 script.on_configuration_changed(onConfigChanges)

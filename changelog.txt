@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.5.6
+Date: 28. 06. 2026
+  Features:
+    - Added remote interface ("trainConstructionSite") exporting get_manager_data to allow addon management mods to read storage tables.
+---------------------------------------------------------------------------------------------------
 Version: 0.5.5
 Date: 27. 06. 2026
   Features:
