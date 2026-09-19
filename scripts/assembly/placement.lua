@@ -10,7 +10,28 @@ function Trainassembly:checkValidPlacement(createdEntity, playerIndex)
   -- trainassembler on the ground where the trainassembler was placed.
   local entityPosition = createdEntity.position
 
-  local notValid = function(localisedMessage)
+  local notValid = function(localisedMessage, waitForRail)
+    -- Robots may build the Trainbuilder before the rail ghosts underneath it. Then put the
+    -- ghost back (with its recipe), so the robots build it again once the rail is there.
+    -- Only while rail ghosts are waiting, otherwise it would loop forever.
+    local ghostData
+    if waitForRail and not playerIndex and createdEntity.surface.count_entities_filtered{
+      ghost_type = {"straight-rail", "legacy-straight-rail"},
+      area = {{entityPosition.x - 3, entityPosition.y - 3}, {entityPosition.x + 3, entityPosition.y + 3}},
+      limit = 1,
+    } > 0 then
+      local recipe = createdEntity.get_recipe()
+      ghostData = {
+        name = "entity-ghost",
+        inner_name = createdEntity.name,
+        position = entityPosition,
+        direction = getEntity4WayDirection(createdEntity),
+        force = createdEntity.force,
+        quality = createdEntity.quality,
+        recipe = recipe and recipe.name,
+      }
+    end
+
     -- Try return the item to the player (or drop it)
     if playerIndex then -- return if possible
       local player = game.players[playerIndex]
@@ -40,7 +61,14 @@ function Trainassembly:checkValidPlacement(createdEntity, playerIndex)
     end
 
     -- Destroy the placed item
+    local surface = createdEntity.surface
     createdEntity.destroy()
+    if ghostData then
+      local recipe = ghostData.recipe
+      ghostData.recipe = nil
+      local ghost = surface.create_entity(ghostData)
+      if ghost and recipe then ghost.set_recipe(recipe) end
+    end
     return false
   end
 
@@ -54,8 +82,7 @@ function Trainassembly:checkValidPlacement(createdEntity, playerIndex)
   -- the script must reject placements that are not on a valid straight rail.
   local foundValidRail = false
   for _,railEntity in pairs(entitySurface.find_entities_filtered{
-    --name = "straight-rail",
-    type = "straight-rail",
+    type = {"straight-rail", "legacy-straight-rail"}, -- legacy rails from old saves are still straight
     area = {
       {entityPosition.x - 3.1, entityPosition.y - 3.1},
       {entityPosition.x + 3.1, entityPosition.y + 3.1},
@@ -99,7 +126,7 @@ function Trainassembly:checkValidPlacement(createdEntity, playerIndex)
   end
 
   if not foundValidRail then
-    return notValid{"trainassembler-message.noRailPlacement", {"item-name.trainassembly"}}
+    return notValid({"trainassembler-message.noRailPlacement", {"item-name.trainassembly"}}, true)
   end
 
   -- STEP 2: Do not allow stacking/overlapping trainassemblers at the same rail

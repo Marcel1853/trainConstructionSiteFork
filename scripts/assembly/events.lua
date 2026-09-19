@@ -47,8 +47,7 @@ function Trainassembly:onBuildEntity(createdEntity, playerIndex)
 
       -- STEP 3: make the rails underneath unminable
       for _,railEntity in pairs(entitySurface.find_entities_filtered{
-        name  = "straight-rail",
-        type  = "straight-rail",
+        type  = {"straight-rail", "legacy-straight-rail"},
         --force = entityForce,
         area  = {
           {entityPosition.x - 3.1, entityPosition.y - 3.1},
@@ -82,7 +81,7 @@ function Trainassembly:onBuildEntity(createdEntity, playerIndex)
       end
     end
 
-  elseif createdEntity.name == "straight-rail" then
+  elseif createdEntity.type == "straight-rail" or createdEntity.type == "legacy-straight-rail" then
     local machineOnRail = createdEntity.surface.find_entities_filtered{
       name      = self:getMachineEntityName(),
       type      = "assembling-machine",
@@ -159,8 +158,7 @@ function Trainassembly:onRemoveEntity(removedEntity, buffer)
 
     -- STEP 2: make the rails underneath minable again
     for _,railEntity in pairs(entitySurface.find_entities_filtered{
-      name  = "straight-rail",
-      type  = "straight-rail",
+      type  = {"straight-rail", "legacy-straight-rail"},
       --force = removedEntity.force,
       area  = {
         {entityPosition.x - 3.1, entityPosition.y - 3.1},

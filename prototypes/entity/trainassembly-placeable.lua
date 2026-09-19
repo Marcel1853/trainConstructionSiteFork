@@ -25,12 +25,16 @@ trainassembly.icon_size = util.table.deepcopy(data.raw["item"][trainassembly.min
 trainassembly.icon_mipmaps = nil
 
 trainassembly.hidden = true
-trainassembly.flags = trainassembly.flags or {}
-table.insert(trainassembly.flags, "not-blueprintable")
+-- Not "not-blueprintable": that flag also forbids ghosts, so the item could not be placed as a
+-- ghost (shift-click) for robots. The entity never stays in the world, it is replaced right away.
 
 -- selection/collision box
 trainassembly.selection_box = {{-3, -3}, {3, 3}}
-trainassembly.collision_box = {{-2.95, -3.9}, {2.95, 3.9}}
+-- Trainbuilders stand 7 tiles apart, so half the box must stay below 3.5: otherwise placing one
+-- overlaps the neighbour's ghost, and the game deletes every ghost a new entity overlaps
+-- (that silently removed Trainbuilders from blueprints). The box must not be square either,
+-- a square one would take the direction away from this assembling machine.
+trainassembly.collision_box = {{-2.95, -3.45}, {2.95, 3.45}}
 trainassembly.drawing_box_vertical_extension = 2
 
 -- Do not collide with straight rails/trains. This matches the old 1.1 logic

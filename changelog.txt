@@ -7,6 +7,10 @@ Date: 19. 09. 2026
     - Fixed possible crashes when removing a Trainbuilder or controller whose data was already removed.
     - Fixed a crash when placing a controller next to a Trainbuilder whose data pointed to a removed Trainbuilder.
     - Fixed controllers placed side by side possibly linking to the neighbouring Trainbuilder. A controller now only links to a Trainbuilder on its own axis that has no controller yet.
+    - Fixed Trainbuilders not being placeable on legacy straight rails.
+    - Fixed the Trainbuilder item not being placeable as a ghost (shift-click); it was flagged not-blueprintable, which also forbids ghosts.
+    - Fixed building a Trainbuilder deleting the ghost of the neighbouring Trainbuilder 7 tiles away, which silently removed Trainbuilders from blueprints.
+    - Fixed robots building a Trainbuilder before the rail ghost underneath it: the ghost is put back with its recipe instead of dropping the item.
   Changes:
     - Trainbuilder numbers are no longer renumbered when a Trainbuilder is removed.
     - Reorganised the script files into scripts/<area>/ folders (no gameplay change).
