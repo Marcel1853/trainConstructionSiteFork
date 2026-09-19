@@ -1,6 +1,9 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.5.8
 Date: 19. 09. 2026
+  Features:
+    - Trainbuilders placed by hand now snap onto the fixed spacing of a neighbouring Trainbuilder, so you no longer have to find the exact gap yourself. Can be turned off per player.
+    - While holding the Trainbuilder item, the free places next to existing Trainbuilders are marked. Can be turned off per player.
   Bugfixes:
     - Fixed Trainbuilder data getting corrupted when robots deconstruct Trainbuilders (controllers pointed to the wrong or an empty Trainbuilder, which caused crashes later).
     - Fixed Trainbuilders staying behind without rails when the rail underneath was removed first. The Trainbuilder item is now returned.
@@ -16,6 +19,7 @@ Date: 19. 09. 2026
     - Trainbuilder numbers are no longer renumbered when a Trainbuilder is removed.
     - Reorganised the script files into scripts/<area>/ folders (no gameplay change).
   Scripting:
+    - Added remote functions "get_snap_position" and "get_placing_help_slots" to the "trainConstructionSite" interface.
     - Added remote function "rebuild_train_builders" to the "trainConstructionSite" interface (repairs Trainbuilder data).
   Info:
     - Existing saves are repaired automatically by a migration.

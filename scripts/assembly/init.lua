@@ -10,6 +10,7 @@ require("scripts.assembly.getters")
 require("scripts.assembly.builders")
 require("scripts.assembly.placement")
 require("scripts.assembly.events")
+require("scripts.assembly.placing-help")
 
 --------------------------------------------------------------------------------
 -- Initiation of the class

@@ -30,11 +30,13 @@ trainassembly.hidden = true
 
 -- selection/collision box
 trainassembly.selection_box = {{-3, -3}, {3, 3}}
--- Trainbuilders stand 7 tiles apart, so half the box must stay below 3.5: otherwise placing one
+-- Trainbuilders stand 7 tiles apart, so the box must stay below 7 long: otherwise placing one
 -- overlaps the neighbour's ghost, and the game deletes every ghost a new entity overlaps
--- (that silently removed Trainbuilders from blueprints). The box must not be square either,
--- a square one would take the direction away from this assembling machine.
-trainassembly.collision_box = {{-2.95, -3.45}, {2.95, 3.45}}
+-- (that silently removed Trainbuilders from blueprints). It must also cover a whole number of
+-- tiles in both directions (6x6 here), otherwise the entity lands on half tiles and the 7 tile
+-- spacing no longer works. And it must not be square, a square box would take the direction
+-- away from this assembling machine.
+trainassembly.collision_box = {{-2.95, -3.0}, {2.95, 3.0}}
 trainassembly.drawing_box_vertical_extension = 2
 
 -- Do not collide with straight rails/trains. This matches the old 1.1 logic

@@ -19,8 +19,16 @@ end)
 
 
 
+script.on_event(defines.events.on_player_cursor_stack_changed, function(event)
+  -- Markierungen der Bauhilfe zeigen/verstecken
+  Trainassembly.PlacingHelp:onCursorChanged(event.player_index)
+end)
+
+
+
 script.on_load(function()
   Traincontroller:onLoad()
+  Trainassembly.PlacingHelp:onLoad()
   ModCompatibility:onLoad()
 end)
 
@@ -65,6 +73,9 @@ local postEntityDiedFilters = {
 script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
   -- called when a mod setting changed
   Traincontroller:onSettingChanged(event)
+  if event.player_index then
+    Trainassembly.PlacingHelp:refresh(event.player_index)
+  end
 end)
 
 
@@ -79,6 +90,7 @@ end)
 
 script.on_event(defines.events.on_player_left_game, function(event)
   -- Called after a player leaves the game.
+  Trainassembly.PlacingHelp:onPlayerLeftGame(event.player_index)
   Traindepot.Gui:onPlayerLeftGame(event.player_index)
   Traincontroller.Gui:onPlayerLeftGame(event.player_index)
 end)

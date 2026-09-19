@@ -16,6 +16,8 @@ function Trainassembly:onBuildEntity(createdEntity, playerIndex)
   -- Player experience: The player thinks he builded an assembling machine on top of rails.
   if createdEntity.name == self:getPlaceableEntityName() or
      createdEntity.name == self:getMachineEntityName() then
+    -- STEP 0: snap a hand placed Trainbuilder onto the fixed spacing of its neighbour
+    self:trySnapPlacement(createdEntity, playerIndex)
     -- We know the createdEntity is the placeable entity, meaning the player wants
     -- to build a trainassembly on this spot
 
@@ -76,6 +78,7 @@ function Trainassembly:onBuildEntity(createdEntity, playerIndex)
 
       -- STEP 4: Save the newly made trainassembly to our data structure so we can keep track of it
       self:saveNewStructure(machineEntity, machineRenderID, playerIndex and {playerIndex = playerIndex} or nil)
+      self.PlacingHelp:refreshAll()
       if Traincontroller and Traincontroller.processPendingControllers then
         Traincontroller:processPendingControllers()
       end
@@ -171,6 +174,7 @@ function Trainassembly:onRemoveEntity(removedEntity, buffer)
 
     -- STEP 3: Update the data structure
     self:deleteBuilding(removedEntity, buffer and {buffer = buffer} or nil)
+    self.PlacingHelp:refreshAll()
 
   elseif removedEntity.type == "straight-rail" or removedEntity.type == "legacy-straight-rail" then
     -- A rail under a Trainbuilder is removed (e.g. bots deconstruct the whole area and take

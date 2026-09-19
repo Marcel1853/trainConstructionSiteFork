@@ -18,6 +18,22 @@ data:extend{
     order = "trainController-c[allow-speed-modules]",
   },
   {
+    -- Snap a hand placed Trainbuilder onto the fixed spacing of its neighbour
+    setting_type = "runtime-per-user",
+    name = "trainassembly-snap-placement",
+    type = "bool-setting",
+    default_value = true,
+    order = "trainassembly-a[snap-placement]",
+  },
+  {
+    -- Show the free places next to existing Trainbuilders while holding the item
+    setting_type = "runtime-per-user",
+    name = "trainassembly-placing-help",
+    type = "bool-setting",
+    default_value = true,
+    order = "trainassembly-b[placing-help]",
+  },
+  {
     -- Ticks between builder updates
     setting_type = "runtime-global",
     name = "trainController-tickRate", -- in ticks

@@ -17,6 +17,20 @@ remote.add_interface("trainConstructionSite", {
     Trainassembly:rebuildTrainBuilders()
   end,
 
+  -- Auf welchen Platz rastet ein hier gesetzter Zugbauer ein? nil = kein Einrasten. (Tests, Werkzeuge)
+  get_snap_position = function(surface_index, position, direction)
+    local surface = game.surfaces[surface_index]
+    if not surface then return nil end
+    return Trainassembly:snapPositionFor(surface, position, direction)
+  end,
+
+  -- Freie Plätze für Zugbauer im Umkreis einer Position. (Tests, Werkzeuge)
+  get_placing_help_slots = function(surface_index, position)
+    local surface = game.surfaces[surface_index]
+    if not surface then return {} end
+    return Trainassembly.PlacingHelp:getSlots(surface, position)
+  end,
+
   open_entity_gui = function(player_index, surface_index, x, y)
     local player = game.players[player_index]
     local surf = game.surfaces[surface_index]
