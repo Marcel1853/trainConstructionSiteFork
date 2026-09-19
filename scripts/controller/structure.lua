@@ -256,7 +256,7 @@ end
 
 function Traincontroller:setDefaultMachineTints(builderIndex)
   -- set the default machine tints depending on the recipe
-  for _, builderLocation in pairs(Trainassembly:getTrainBuilder(builderIndex)) do
+  for _, builderLocation in pairs(Trainassembly:getTrainBuilder(builderIndex) or {}) do
     local builderEntity = Trainassembly:getMachineEntity(builderLocation["surfaceIndex"], builderLocation["position"])
     if builderEntity and builderEntity.valid then
       local builderRecipe = builderEntity.get_recipe()
@@ -272,7 +272,7 @@ end
 
 function Traincontroller:deleteBuildTrain(builderIndex)
   -- delete the whole created train from a builder
-  for _, builderLocation in pairs(Trainassembly:getTrainBuilder(builderIndex)) do
+  for _, builderLocation in pairs(Trainassembly:getTrainBuilder(builderIndex) or {}) do
     Trainassembly:deleteCreatedTrainEntity(builderLocation["surfaceIndex"], builderLocation["position"])
   end
 end

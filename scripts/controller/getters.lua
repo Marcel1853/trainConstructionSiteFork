@@ -29,6 +29,8 @@ function Traincontroller:getDepotForceName(controllerForceName)
 end
 
 function Traincontroller:getTrainController(trainBuilderIndex)
+  -- without an index every controller whose index is not set yet would match
+  if not trainBuilderIndex then return nil end
   for surfaceIndex, _ in pairs(storage.TC_data["trainControllers"]) do
     for positionY, _ in pairs(storage.TC_data["trainControllers"][surfaceIndex]) do
       for positionX, _ in pairs(storage.TC_data["trainControllers"][surfaceIndex][positionY]) do
@@ -115,8 +117,10 @@ function Traincontroller:getTrainBuilderCount(controllerForceName, controllerSur
 end
 
 function Traincontroller:getTrainHiddenEntity(controllerEntity, hiddenEntityIndex)
-  return storage.TC_data["trainControllers"][controllerEntity.surface.index][controllerEntity.position.y]
-  [controllerEntity.position.x]["entity-hidden"][hiddenEntityIndex]
+  local surfaceData = storage.TC_data["trainControllers"][controllerEntity.surface.index]
+  local row = surfaceData and surfaceData[controllerEntity.position.y]
+  local controllerData = row and row[controllerEntity.position.x]
+  return controllerData and controllerData["entity-hidden"] and controllerData["entity-hidden"][hiddenEntityIndex]
 end
 
 function Traincontroller:getHiddenEntityData(position, direction)

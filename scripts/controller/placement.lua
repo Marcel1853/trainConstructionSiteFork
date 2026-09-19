@@ -54,7 +54,7 @@ function Traincontroller:checkValidAftherChanges(alteredEntity, playerIndex)
       -- direction
       local hasValidLocomotive = false
       local hasAllRecipesSet = true
-      for _, builderLocation in pairs(Trainassembly:getTrainBuilder(trainBuilderIndex)) do
+      for _, builderLocation in pairs(Trainassembly:getTrainBuilder(trainBuilderIndex) or {}) do
         local machineEntity = Trainassembly:getMachineEntity(builderLocation["surfaceIndex"], builderLocation
         ["position"])
         if machineEntity and machineEntity.valid and machineEntity.direction == trainController.direction then
@@ -172,6 +172,24 @@ function Traincontroller:checkValidPlacement(createdEntity, playerIndex, deferIn
   local entitySurface = createdEntity.surface
   local entitySurfaceIndex = entitySurface.index
 
+  -- Only machines on the same axis as the controller (a controller facing east controls a
+  -- horizontal builder) whose builder exists and has no controller yet are candidates. Otherwise
+  -- a controller next to another builder could pick that one (two controllers side by side).
+  local controllerVertical = entityDirection == defines.direction.north or entityDirection == defines.direction.south
+  local foundControlledBuilder = false
+  local function isFreeCandidate(candidate)
+    if not (candidate and candidate.valid) then return false end
+    local candidateVertical = candidate.direction == defines.direction.north or candidate.direction == defines.direction.south
+    if candidateVertical ~= controllerVertical then return false end
+    local candidateBuilderIndex = Trainassembly:getTrainBuilderIndex(candidate)
+    if not (candidateBuilderIndex and Trainassembly:getTrainBuilder(candidateBuilderIndex)) then return false end
+    if self:getTrainController(candidateBuilderIndex) then
+      foundControlledBuilder = true
+      return false
+    end
+    return true
+  end
+
   local builderEntity
   local bestBuilderScore
   for _, candidate in pairs(entitySurface.find_entities_filtered {
@@ -182,7 +200,7 @@ function Traincontroller:checkValidPlacement(createdEntity, playerIndex, deferIn
       { entityPosition.x + 10, entityPosition.y + 10 },
     },
   }) do
-    if candidate and candidate.valid then
+    if isFreeCandidate(candidate) then
       local dx = candidate.position.x - entityPosition.x
       local dy = candidate.position.y - entityPosition.y
       local forward = dx * entitySearchDirection.x + dy * entitySearchDirection.y
@@ -216,8 +234,7 @@ function Traincontroller:checkValidPlacement(createdEntity, playerIndex, deferIn
         { entityPosition.x + 16, entityPosition.y + 16 },
       },
     }) do
-      local candidateBuilderIndex = Trainassembly:getTrainBuilderIndex(candidate)
-      if candidate and candidate.valid and candidateBuilderIndex then
+      if isFreeCandidate(candidate) then
         local dx = candidate.position.x - entityPosition.x
         local dy = candidate.position.y - entityPosition.y
         local distance = dx * dx + dy * dy
@@ -230,6 +247,12 @@ function Traincontroller:checkValidPlacement(createdEntity, playerIndex, deferIn
   end
 
   if not (builderEntity and builderEntity.valid) then
+    if foundControlledBuilder then
+      return notValid { "traincontroller-message.isAlreadyControlled",
+        --[[1]] { "item-name.trainassembly" },
+        --[[2]] { "item-name.traincontroller", { "item-name.trainassembly" } },
+      }
+    end
     return notValid { "traincontroller-message.noTrainbuilderFound", { "item-name.trainassembly" } }
   end
 
@@ -251,7 +274,7 @@ function Traincontroller:checkValidPlacement(createdEntity, playerIndex, deferIn
   --         one of the recipes must be a locomotive that is facing it the
   --         direction the train is supposed to leave.
   local hasValidLocomotive = false
-  for _, builderLocation in pairs(Trainassembly:getTrainBuilder(builderIndex)) do
+  for _, builderLocation in pairs(Trainassembly:getTrainBuilder(builderIndex) or {}) do
     local machineEntity = Trainassembly:getMachineEntity(builderLocation["surfaceIndex"], builderLocation["position"])
     if machineEntity and machineEntity.valid then
       -- check the recipe of each machineEntity
