@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
--- Traincontroller.Builder: Heartbeat (on_nth_tick) und Zustandsautomat je Controller.
+-- Traincontroller.Builder: Zustandsautomat je Controller. Der Takt liegt in scripts/core/heartbeat.lua.
 
 -- Create class
 Traincontroller.Builder = {}
@@ -14,35 +14,16 @@ function Traincontroller.Builder:onInit()
 end
 
 function Traincontroller.Builder:onLoad()
-  -- sync the on tick event
-  if storage.TC_data.Builder["onTickActive"] then
-    self:activateOnTick()
-  else
-    self:deactivateOnTick()
-  end
+  -- the heartbeat registers itself again, see scripts/core/heartbeat.lua
+  Heartbeat:onLoad()
 end
 
 -- called when a mod setting changed
 function Traincontroller.Builder:onSettingChanged(event)
   -- check if the tickrate has changed
   if event.setting_type == "runtime-global" and event.setting == "trainController-tickRate" then
-    -- we need to update the on_nth_tick event (step 2), but we fist need to
-    -- disable the old one if it was active (step 1), and if it was active,
-    -- we have to reactivate it afther updating the settings (step 3)
-    local onTickWasActive = storage.TC_data.Builder["onTickActive"]
-
-    -- STEP 1: disable the old active on_tick
-    if onTickWasActive then
-      self:deactivateOnTick()
-    end
-
-    -- STEP 2: update the settings
     storage.TC_data.Builder["onTickDelay"] = settings.global[event.setting].value
-
-    -- STEP 3: reactivate the on_tick with new settings
-    if onTickWasActive then
-      self:activateOnTick()
-    end
+    Heartbeat:sync() -- meldet den Takt mit der neuen Zahl neu an
   end
 end
 
@@ -149,18 +130,24 @@ end
 -- Event interface
 --------------------------------------------------------------------------------
 function Traincontroller.Builder:onTick(event)
-  --game.print(game.tick)
-
   -- Extract the controller that needs to be updated
-  local controller     = util.table.deepcopy(storage.TC_data["nextTrainControllerIterate"])
+  local controller = util.table.deepcopy(storage.TC_data["nextTrainControllerIterate"])
+  if not controller then return end -- nothing to do
   local surfaceIndex   = controller.surfaceIndex
   local position       = controller.position
 
+  -- the entry can be gone already (controller removed in between)
+  local surfaceData = storage.TC_data["trainControllers"][surfaceIndex]
+  local row = surfaceData and surfaceData[position.y]
+  local controllerData = row and row[position.x]
+  if not controllerData then
+    storage.TC_data["nextTrainControllerIterate"] = nil
+    Heartbeat:sync()
+    return
+  end
+
   -- extract the next controller
-  local nextController = util.table.deepcopy(
-    storage.TC_data["trainControllers"][controller.surfaceIndex][controller.position.y][controller.position.x]
-    ["nextController"]
-  )
+  local nextController = util.table.deepcopy(controllerData["nextController"])
 
   -- Update the controller
   self:updateController(surfaceIndex, position)
@@ -171,16 +158,11 @@ function Traincontroller.Builder:onTick(event)
   end
 end
 
+-- Alte Namen, damit ältere Aufrufe weiter stimmen: beides regelt jetzt der Heartbeat.
 function Traincontroller.Builder:activateOnTick()
-  --game.print("on_tick activated")
-  script.on_nth_tick(storage.TC_data.Builder["onTickDelay"], function(event)
-    self:onTick(event)
-  end)
-  storage.TC_data.Builder["onTickActive"] = true
+  Heartbeat:sync()
 end
 
 function Traincontroller.Builder:deactivateOnTick()
-  --game.print("on_tick deactivated")
-  script.on_nth_tick(storage.TC_data.Builder["onTickDelay"], nil)
-  storage.TC_data.Builder["onTickActive"] = false
+  Heartbeat:sync()
 end

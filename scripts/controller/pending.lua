@@ -3,22 +3,13 @@
 
 local getEntity4WayDirection = require("scripts.lib.direction")
 
+-- Der Takt liegt in scripts/core/heartbeat.lua; hier wird er nur nachgezogen.
 function Traincontroller:activatePendingControllerTick()
-  script.on_nth_tick(120, function(event)
-    Traincontroller:processPendingControllers(event)
-  end)
-end
-
-function Traincontroller:deactivatePendingControllerTick()
-  script.on_nth_tick(120, nil)
+  Heartbeat:sync()
 end
 
 function Traincontroller:syncPendingControllerTick()
-  if storage.TC_data and storage.TC_data["pendingControllers"] and next(storage.TC_data["pendingControllers"]) then
-    self:activatePendingControllerTick()
-  else
-    self:deactivatePendingControllerTick()
-  end
+  Heartbeat:sync()
 end
 
 function Traincontroller:addPendingController(controllerEntity)

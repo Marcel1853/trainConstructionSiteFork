@@ -4,6 +4,7 @@
 -- builder + build-train (Zug bauen und losschicken), GUI in scripts/gui/controller/.
 
 Traincontroller = {}
+require("scripts.core.heartbeat")
 require("scripts.controller.structure")
 require("scripts.controller.getters")
 require("scripts.controller.placement")
@@ -27,9 +28,9 @@ function Traincontroller:onInit()
 end
 
 function Traincontroller:onLoad()
-  -- Sync global state on multiplayer, make sure event handlers are set correctly
+  -- Register the event handlers again. storage must not be changed here, so this only
+  -- registers the heartbeat the way it was saved (see scripts/core/heartbeat.lua).
   self.Builder:onLoad()
-  self:syncPendingControllerTick()
 end
 
 function Traincontroller:onSettingChanged(event)
