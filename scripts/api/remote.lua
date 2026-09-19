@@ -31,6 +31,11 @@ remote.add_interface("trainConstructionSite", {
     return Trainassembly.PlacingHelp:getSlots(surface, position)
   end,
 
+  -- Anforderung eines Depots setzen. (Tests, Werkzeuge)
+  set_depot_request_count = function(force_name, surface_index, depot_name, count)
+    Traindepot:setDepotRequestCount(force_name, surface_index, depot_name, count)
+  end,
+
   open_entity_gui = function(player_index, surface_index, x, y)
     local player = game.players[player_index]
     local surf = game.surfaces[surface_index]

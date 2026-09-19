@@ -15,6 +15,8 @@ Date: 19. 09. 2026
     - Fixed building a Trainbuilder deleting the ghost of the neighbouring Trainbuilder 7 tiles away, which silently removed Trainbuilders from blueprints.
     - Fixed robots building a Trainbuilder before the rail ghost underneath it: the ghost is put back with its recipe instead of dropping the item.
     - Fixed a possible crash when the controller that was next in line got removed in the same tick.
+    - Fixed a copied Trainbuilder controller or depot (blueprint, copy-paste) losing its station name, which broke the link between controller and depot and reset the depot request count.
+    - Fixed the controller being removed when robots add the last wagon of a blueprint. A controller whose Trainbuilder changes now waits until it fits again and only gives its item back after 30 seconds.
     - Fixed the controller item being dropped on the ground when its Trainbuilder changes (a wagon added or removed). It now goes to the player or robot that caused the change, and is only dropped when that is not possible.
   Locale:
     - The last two hard coded English messages are now translated (English and German).

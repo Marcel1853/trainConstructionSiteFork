@@ -17,14 +17,20 @@ function Traincontroller:onBuildEntity(createdEntity, playerIndex)
     -- it is the correct entity, now check if its correctly placed
     local validPlacement, trainBuilderIndex = self:checkValidPlacement(createdEntity, playerIndex, not playerIndex)
     if validPlacement then -- It is valid, now we have to add the entity to the list
+      -- A copy (blueprint) already carries the name of its depot: keep it, it is the link to
+      -- that depot. Check before saving, saving counts this controller as well.
+      local keepStationName = self:hasUsefulStationName(createdEntity)
+
       createdEntity.direction = getEntity4WayDirection(createdEntity)
       self:saveNewStructure(createdEntity, trainBuilderIndex)
       self:setDefaultMachineTints(trainBuilderIndex)
 
-      -- after structure is saved, we rename it, this will trigger Traincontroller:onRenameEntity as well
-      -- Kein Locale-Text: der backer_name ist der Name des Zughalts. Übersetzt hieße derselbe
-      -- Halt je nach Sprache anders, und Fahrpläne bestehender Züge würden nicht mehr passen.
-      createdEntity.backer_name = "Unused Trainbuilder"
+      if not keepStationName then
+        -- after structure is saved, we rename it, this will trigger Traincontroller:onRenameEntity as well
+        -- Kein Locale-Text: der backer_name ist der Name des Zughalts. Übersetzt hieße derselbe
+        -- Halt je nach Sprache anders, und Fahrpläne bestehender Züge würden nicht mehr passen.
+        createdEntity.backer_name = "Unused Trainbuilder"
+      end
     elseif not playerIndex and createdEntity.valid then
       self:addPendingController(createdEntity)
     end
@@ -76,6 +82,31 @@ function Traincontroller:onRenameEntity(renamedEntity, oldName)
 end
 
 -- when a trainbuilder gets altered (buildings added/deleted buildings)
+-- Gibt das Item des Controllers zurück: in den Puffer des abbauenden Spielers/Bots, an den
+-- bauenden Spieler, sonst auf den Boden (zum Abholen markiert).
+function Traincontroller:returnControllerItem(controllerEntity, receiver)
+  local itemStack = { name = self:getControllerItemName(), count = 1 }
+  if receiver then
+    if receiver.buffer and receiver.buffer.valid then
+      if receiver.buffer.insert(itemStack) > 0 then return end
+    elseif receiver.playerIndex then
+      local player = game.get_player(receiver.playerIndex)
+      if player and player.insert(itemStack) > 0 then return end
+    end
+  end
+
+  local droppedItem = controllerEntity.surface.create_entity {
+    name = "item-on-ground",
+    stack = itemStack,
+    position = controllerEntity.position,
+    force = storage.TC_data["trainControllerForces"][controllerEntity.force.name] or controllerEntity.force,
+    fast_replace = true,
+    spill = false, -- delete excess items (only if fast_replace = true)
+  }
+  droppedItem.to_be_looted = true
+  droppedItem.order_deconstruction(controllerEntity.force)
+end
+
 -- receiver: where the controller item should go when the Trainbuilder it controls changes.
 -- {buffer = …} is the inventory of the player/robot that mined, {playerIndex = …} the builder.
 function Traincontroller:onTrainbuilderAltered(trainBuilderIndex, receiver)
@@ -88,31 +119,17 @@ function Traincontroller:onTrainbuilderAltered(trainBuilderIndex, receiver)
     -- delete from structure
     self:deleteController(trainController)
 
-    -- give the controller item back: into the same buffer as the mined Trainbuilder, or to the
-    -- player who changed the Trainbuilder. Only drop it when neither works.
-    local itemStack = { name = self:getControllerItemName(), count = 1 }
-    local givenBack = false
-    if receiver then
-      if receiver.buffer and receiver.buffer.valid then
-        givenBack = receiver.buffer.insert(itemStack) > 0
-      elseif receiver.playerIndex then
-        local player = game.get_player(receiver.playerIndex)
-        givenBack = player ~= nil and player.insert(itemStack) > 0
-      end
+    -- The Trainbuilder changed, but the controller often still fits: a robot adding the last
+    -- wagon of a blueprint, or a wagon mined from a longer Trainbuilder. Put it in the waiting
+    -- list instead of removing it; it becomes active again as soon as it fits. Only when it
+    -- still does not fit after a while is the item given back (see scripts/controller/pending.lua).
+    if trainController.valid then
+      local depotForceName = storage.TC_data["trainControllerForces"][trainController.force.name]
+      if depotForceName then trainController.force = depotForceName end
+      self:addPendingController(trainController, {
+        deadline = game.tick + 1800, -- 30 Sekunden
+        playerIndex = receiver and receiver.playerIndex or nil,
+      })
     end
-
-    if not givenBack then
-      local droppedItem = trainController.surface.create_entity {
-        name = "item-on-ground",
-        stack = itemStack,
-        position = trainController.position,
-        force = storage.TC_data["trainControllerForces"][trainController.force.name] or trainController.force,
-        fast_replace = true,
-        spill = false, -- delete excess items (only if fast_replace = true)
-      }
-      droppedItem.to_be_looted = true
-      droppedItem.order_deconstruction(trainController.force)
-    end
-    trainController.destroy { raise_destroy = true }
   end
 end

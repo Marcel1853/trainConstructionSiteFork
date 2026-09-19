@@ -116,6 +116,22 @@ function Traincontroller:getTrainBuilderCount(controllerForceName, controllerSur
   return self:getTrainBuilderNames(controllerForceName, controllerSurfaceIndex)[controllerName] or 0
 end
 
+-- Trägt der Controller bereits einen Namen, der etwas bedeutet? Das ist der Fall, wenn es ein
+-- Depot dieses Namens gibt oder schon ein anderer Controller so heißt (Kopie einer Anlage).
+-- Nur dann darf der Name beim Bauen nicht durch den Standardnamen ersetzt werden.
+function Traincontroller:hasUsefulStationName(controllerEntity)
+  local stationName = controllerEntity.backer_name
+  if not stationName or stationName == "" then return false end
+
+  local depotForceName = storage.TC_data["trainControllerForces"][controllerEntity.force.name] or
+                         controllerEntity.force.name
+  local surfaceIndex = controllerEntity.surface.index
+  if Traindepot:getDepotStationCount(depotForceName, surfaceIndex, stationName) > 0 then
+    return true
+  end
+  return self:getTrainBuilderCount(self:getControllerForceName(depotForceName), surfaceIndex, stationName) > 0
+end
+
 function Traincontroller:getTrainHiddenEntity(controllerEntity, hiddenEntityIndex)
   local surfaceData = storage.TC_data["trainControllers"][controllerEntity.surface.index]
   local row = surfaceData and surfaceData[controllerEntity.position.y]

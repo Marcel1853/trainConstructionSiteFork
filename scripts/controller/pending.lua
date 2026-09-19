@@ -12,7 +12,9 @@ function Traincontroller:syncPendingControllerTick()
   Heartbeat:sync()
 end
 
-function Traincontroller:addPendingController(controllerEntity)
+-- options: {deadline = Tick, playerIndex = …} – ohne Frist wartet der Controller unbegrenzt
+-- (von Bots gebaut, der Trainbuilder kommt noch). Mit Frist wird das Item danach zurückgegeben.
+function Traincontroller:addPendingController(controllerEntity, options)
   if not (controllerEntity and controllerEntity.valid) then return end
   storage.TC_data["pendingControllers"] = storage.TC_data["pendingControllers"] or {}
   local key = controllerEntity.unit_number or
@@ -20,6 +22,8 @@ function Traincontroller:addPendingController(controllerEntity)
   storage.TC_data["pendingControllers"][key] = {
     entity = controllerEntity,
     since = game.tick,
+    deadline = options and options.deadline or nil,
+    playerIndex = options and options.playerIndex or nil,
   }
   self:activatePendingControllerTick()
 end
@@ -44,11 +48,16 @@ function Traincontroller:tryActivateController(controllerEntity)
 
   local validPlacement, trainBuilderIndex = self:checkValidPlacement(controllerEntity, nil, true)
   if validPlacement then
+    -- Name einer Kopie behalten, siehe scripts/controller/events.lua
+    local keepStationName = self:hasUsefulStationName(controllerEntity)
+
     controllerEntity.direction = getEntity4WayDirection(controllerEntity)
     self:saveNewStructure(controllerEntity, trainBuilderIndex)
     self:setDefaultMachineTints(trainBuilderIndex)
-    -- siehe scripts/controller/events.lua: der backer_name bleibt englisch (Name des Zughalts)
-    controllerEntity.backer_name = "Unused Trainbuilder"
+    if not keepStationName then
+      -- siehe scripts/controller/events.lua: der backer_name bleibt englisch (Name des Zughalts)
+      controllerEntity.backer_name = "Unused Trainbuilder"
+    end
     self:removePendingController(controllerEntity)
     return true
   end
@@ -63,8 +72,14 @@ function Traincontroller:processPendingControllers(event)
     local controllerEntity = pendingData.entity
     if not (controllerEntity and controllerEntity.valid) then
       pendingControllers[key] = nil
-    else
-      self:tryActivateController(controllerEntity)
+    elseif not self:tryActivateController(controllerEntity) then
+      -- Controller, die wegen einer Änderung am Trainbuilder warten, haben eine Frist. Passt es
+      -- bis dahin nicht, geht das Item zurück und der Zughalt verschwindet.
+      if pendingData.deadline and game.tick > pendingData.deadline then
+        self:returnControllerItem(controllerEntity, { playerIndex = pendingData.playerIndex })
+        pendingControllers[key] = nil
+        controllerEntity.destroy { raise_destroy = true }
+      end
     end
   end
 
