@@ -5,6 +5,8 @@ Date: 19. 09. 2026
     - Fixed Trainbuilder data getting corrupted when robots deconstruct Trainbuilders (controllers pointed to the wrong or an empty Trainbuilder, which caused crashes later).
     - Fixed Trainbuilders staying behind without rails when the rail underneath was removed first. The Trainbuilder item is now returned.
     - Fixed possible crashes when removing a Trainbuilder or controller whose data was already removed.
+    - Fixed a crash when placing a controller next to a Trainbuilder whose data pointed to a removed Trainbuilder.
+    - Fixed controllers placed side by side possibly linking to the neighbouring Trainbuilder. A controller now only links to a Trainbuilder on its own axis that has no controller yet.
   Changes:
     - Trainbuilder numbers are no longer renumbered when a Trainbuilder is removed.
     - Reorganised the script files into scripts/<area>/ folders (no gameplay change).
