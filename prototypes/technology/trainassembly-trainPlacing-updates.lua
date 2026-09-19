@@ -14,9 +14,9 @@ local recipesToIgnore = {
 }
 
 -- for mod compatibility we have to add these fluid recipe unlocks to the tech tree
-local trainsToIgnore = require("prototypes/modded-trains-to-ignore")
-local itemOverride   = require("prototypes/modded-trains-item-override")
-local recipeOverride = require("prototypes/modded-trains-recipe-override")
+local trainsToIgnore = require("prototypes/modded/trains-to-ignore")
+local itemOverride   = require("prototypes/modded/trains-item-override")
+local recipeOverride = require("prototypes/modded/trains-recipe-override")
 for _, trainType in pairs(trainRecipe.train_types) do
   -- For each type, we get all the different entities (ex: locomotive mk1, mk2, ...)
   for _, trainEntity in pairs(data.raw[trainType] or {}) do

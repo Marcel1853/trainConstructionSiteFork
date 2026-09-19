@@ -28,7 +28,7 @@ FLib.item.setOrderstring = function(type_name, prototype_name, order_string)
 end
 
 -- Other mod items related to trains to be sorted
-require "prototypes/modded-updates-trainfuel"
+require "prototypes/modded/updates-trainfuel"
 local otherVehicleGroup = "manual-buildable-vehicles"
 
 if mods["concreted-rails"] then

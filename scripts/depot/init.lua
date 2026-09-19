@@ -1,10 +1,10 @@
 ---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
-require 'util'
-require("compat.lslib")
+-- Traindepot: Depots (Zughalte), zu denen fertige Züge fahren. GUI in scripts/gui/depot/.
+
+Traindepot = {}
+require("scripts.gui.depot.init")
 
 -- Create class
-Traindepot = {}
-require 'src.traindepot-gui'
 
 --------------------------------------------------------------------------------
 -- Initiation of the class

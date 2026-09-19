@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
-local itemOverride   = require("prototypes/modded-trains-item-override")
-local recipeOverride = require("prototypes/modded-trains-recipe-override")
+local itemOverride   = require("prototypes/modded/trains-item-override")
+local recipeOverride = require("prototypes/modded/trains-recipe-override")
 local trainRecipe    = require("compat.train_recipe")
 
 local function getTrainRecipeLocalisedName(item, trainEntity)
@@ -20,7 +20,7 @@ end
 -- our trainbuilding to make an actual train on the tracks. To get the fluidname
 -- we require the itemname. To aquire the itemname we get the entity.minable.result.
 -- For this we start to iterate over all tine train types
-local trainsToIgnore = require("prototypes/modded-trains-to-ignore")
+local trainsToIgnore = require("prototypes/modded/trains-to-ignore")
 for _, trainType in pairs(trainRecipe.train_types) do
   -- For each type, we get all the different entities (ex: locomotive mk1, mk2, ...)
   for _, trainEntity in pairs(data.raw[trainType] or {}) do

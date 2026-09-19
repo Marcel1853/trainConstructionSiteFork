@@ -1,4 +1,18 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.5.8
+Date: 19. 09. 2026
+  Bugfixes:
+    - Fixed Trainbuilder data getting corrupted when robots deconstruct Trainbuilders (controllers pointed to the wrong or an empty Trainbuilder, which caused crashes later).
+    - Fixed Trainbuilders staying behind without rails when the rail underneath was removed first. The Trainbuilder item is now returned.
+    - Fixed possible crashes when removing a Trainbuilder or controller whose data was already removed.
+  Changes:
+    - Trainbuilder numbers are no longer renumbered when a Trainbuilder is removed.
+    - Reorganised the script files into scripts/<area>/ folders (no gameplay change).
+  Scripting:
+    - Added remote function "rebuild_train_builders" to the "trainConstructionSite" interface (repairs Trainbuilder data).
+  Info:
+    - Existing saves are repaired automatically by a migration.
+---------------------------------------------------------------------------------------------------
 Version: 0.5.7
 Date: 29. 06. 2026
   Bugfixes:

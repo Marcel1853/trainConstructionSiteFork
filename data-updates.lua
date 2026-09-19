@@ -11,4 +11,4 @@ require "prototypes.entity.trainassembly-placeable-updates"
 require "prototypes.technology.trainassembly-trainPlacing-updates"
 require "prototypes.technology.trainassembly-vehicles-updates"
 
-require "prototypes.modded-updates"
+require "prototypes.modded.updates"

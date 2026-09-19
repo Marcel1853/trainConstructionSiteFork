@@ -1,3 +1,5 @@
+---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
+
 -- Remote interface for Train Construction Site Manager Addon
 -- Provides access to storage tables and helper methods
 
@@ -8,6 +10,11 @@ remote.add_interface("trainConstructionSite", {
       TC_data = storage.TC_data,
       TA_data = storage.TA_data
     }
+  end,
+
+  -- Baut alle Trainbuilder-Daten neu auf und verbindet die Controller neu (Reparatur, Tests).
+  rebuild_train_builders = function()
+    Trainassembly:rebuildTrainBuilders()
   end,
 
   open_entity_gui = function(player_index, surface_index, x, y)

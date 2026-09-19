@@ -11,9 +11,9 @@ locomotiveManualBuild.order = "a[railway]-a[vanilla]"
 -- don't want the player to place down the train manualy. We have to remove the
 -- place_result on the entity.
 
-local trainsToIgnore = require("prototypes/modded-trains-to-ignore")
-local itemOrder      = require("prototypes/modded-trains-ordening")
-local itemOverride   = require("prototypes/modded-trains-item-override")
+local trainsToIgnore = require("prototypes/modded/trains-to-ignore")
+local itemOrder      = require("prototypes/modded/trains-ordening")
+local itemOverride   = require("prototypes/modded/trains-item-override")
 local itemPlaceResult = {}
 
 -- For each train type like item we want to change the place_result

@@ -1,8 +1,5 @@
 ---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
-require 'util'
-require "src.traindepot"
-require "src.trainassembly"
-require "src.traincontroller"
+-- Debug: Testanlage beim ersten Spieler (nur mit Debug.enabled = true).
 
 Debug = {
   enabled = false
