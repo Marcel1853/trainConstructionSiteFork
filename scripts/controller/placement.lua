@@ -291,7 +291,10 @@ function Traincontroller:checkValidPlacement(createdEntity, playerIndex, deferIn
         end
       end
     else
-      return notValid("ERROR: Invalid building! Report this please.")
+      return notValid { "traincontroller-message.invalidBuilding",
+        --[[1]] { "item-name.trainassembly" },
+        --[[2]] { "item-name.traincontroller", { "item-name.trainassembly" } },
+      }
     end
   end
 

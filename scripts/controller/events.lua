@@ -22,6 +22,8 @@ function Traincontroller:onBuildEntity(createdEntity, playerIndex)
       self:setDefaultMachineTints(trainBuilderIndex)
 
       -- after structure is saved, we rename it, this will trigger Traincontroller:onRenameEntity as well
+      -- Kein Locale-Text: der backer_name ist der Name des Zughalts. Übersetzt hieße derselbe
+      -- Halt je nach Sprache anders, und Fahrpläne bestehender Züge würden nicht mehr passen.
       createdEntity.backer_name = "Unused Trainbuilder"
     elseif not playerIndex and createdEntity.valid then
       self:addPendingController(createdEntity)

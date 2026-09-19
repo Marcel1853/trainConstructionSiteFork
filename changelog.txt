@@ -16,6 +16,8 @@ Date: 19. 09. 2026
     - Fixed robots building a Trainbuilder before the rail ghost underneath it: the ghost is put back with its recipe instead of dropping the item.
     - Fixed a possible crash when the controller that was next in line got removed in the same tick.
     - Fixed the controller item being dropped on the ground when its Trainbuilder changes (a wagon added or removed). It now goes to the player or robot that caused the change, and is only dropped when that is not possible.
+  Locale:
+    - The last two hard coded English messages are now translated (English and German).
   Changes:
     - The Trainbuilder update and the controllers waiting for their Trainbuilder now share a single heartbeat instead of registering two separate on_nth_tick handlers.
     - Trainbuilder numbers are no longer renumbered when a Trainbuilder is removed.

@@ -258,4 +258,7 @@ function Traincontroller.Gui:hasOpenedGui(playerIndex)
 end
 
 require("scripts.gui.controller.click-handlers")
+require("scripts.gui.controller.click-handlers-color")
+-- erst jetzt, wenn alle Handler bekannt sind
+Traincontroller.Gui.clickHandlers = Traincontroller.Gui:initClickHandlers()
 require("scripts.gui.controller.window")

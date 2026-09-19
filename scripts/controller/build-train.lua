@@ -28,7 +28,9 @@ function Traincontroller.Builder:getBuildTrain(trainBuilderIndex)
 
   -- STEP 4: Before returning this train, make sure this is the whole train! (becose of step 1)
   if not (#train.carriages == #trainBuilder) then
-    game.print("ERROR: The build train is not the fully build train, please report this to the mod author!")
+    game.print { "traincontroller-message.trainNotComplete",
+      --[[1]] { "item-name.traincontroller", { "item-name.trainassembly" } },
+    }
     return nil
   end
 

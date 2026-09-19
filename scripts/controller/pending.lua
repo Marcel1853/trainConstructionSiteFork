@@ -47,6 +47,7 @@ function Traincontroller:tryActivateController(controllerEntity)
     controllerEntity.direction = getEntity4WayDirection(controllerEntity)
     self:saveNewStructure(controllerEntity, trainBuilderIndex)
     self:setDefaultMachineTints(trainBuilderIndex)
+    -- siehe scripts/controller/events.lua: der backer_name bleibt englisch (Name des Zughalts)
     controllerEntity.backer_name = "Unused Trainbuilder"
     self:removePendingController(controllerEntity)
     return true
