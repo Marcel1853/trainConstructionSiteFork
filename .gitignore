@@ -5,6 +5,9 @@
 # Compiled Lua sources
 luac.out
 
+# Plan, Ideen, Skill-Kopie und Tests (nur lokal)
+docs/
+CLAUDE.md
 # luarocks build files
 *.src.rock
 *.tar.gz
@@ -92,3 +95,6 @@ version-history/
 
 # Code folders
 build/tmp
+
+# Gepackte Mod-Zips
+dist/
