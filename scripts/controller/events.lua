@@ -74,8 +74,10 @@ function Traincontroller:onRenameEntity(renamedEntity, oldName)
 end
 
 -- when a trainbuilder gets altered (buildings added/deleted buildings)
-function Traincontroller:onTrainbuilderAltered(trainBuilderIndex)
-  -- if there is a traincontroller, we drop it on the floor
+-- receiver: where the controller item should go when the Trainbuilder it controls changes.
+-- {buffer = …} is the inventory of the player/robot that mined, {playerIndex = …} the builder.
+function Traincontroller:onTrainbuilderAltered(trainBuilderIndex, receiver)
+  -- if there is a traincontroller, give its item back (or drop it on the floor)
   local trainController = self:getTrainController(trainBuilderIndex)
   if trainController then
     -- remove the created train
@@ -84,20 +86,31 @@ function Traincontroller:onTrainbuilderAltered(trainBuilderIndex)
     -- delete from structure
     self:deleteController(trainController)
 
-    -- drop the controller on the ground
-    local droppedItem = trainController.surface.create_entity {
-      name = "item-on-ground",
-      stack = {
-        name = self:getControllerItemName(),
-        count = 1,
-      },
-      position = trainController.position,
-      force = storage.TC_data["trainControllerForces"][trainController.force.name] or trainController.force,
-      fast_replace = true,
-      spill = false, -- delete excess items (only if fast_replace = true)
-    }
-    droppedItem.to_be_looted = true
-    droppedItem.order_deconstruction(trainController.force)
+    -- give the controller item back: into the same buffer as the mined Trainbuilder, or to the
+    -- player who changed the Trainbuilder. Only drop it when neither works.
+    local itemStack = { name = self:getControllerItemName(), count = 1 }
+    local givenBack = false
+    if receiver then
+      if receiver.buffer and receiver.buffer.valid then
+        givenBack = receiver.buffer.insert(itemStack) > 0
+      elseif receiver.playerIndex then
+        local player = game.get_player(receiver.playerIndex)
+        givenBack = player ~= nil and player.insert(itemStack) > 0
+      end
+    end
+
+    if not givenBack then
+      local droppedItem = trainController.surface.create_entity {
+        name = "item-on-ground",
+        stack = itemStack,
+        position = trainController.position,
+        force = storage.TC_data["trainControllerForces"][trainController.force.name] or trainController.force,
+        fast_replace = true,
+        spill = false, -- delete excess items (only if fast_replace = true)
+      }
+      droppedItem.to_be_looted = true
+      droppedItem.order_deconstruction(trainController.force)
+    end
     trainController.destroy { raise_destroy = true }
   end
 end

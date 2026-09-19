@@ -11,6 +11,7 @@ Date: 19. 09. 2026
     - Fixed the Trainbuilder item not being placeable as a ghost (shift-click); it was flagged not-blueprintable, which also forbids ghosts.
     - Fixed building a Trainbuilder deleting the ghost of the neighbouring Trainbuilder 7 tiles away, which silently removed Trainbuilders from blueprints.
     - Fixed robots building a Trainbuilder before the rail ghost underneath it: the ghost is put back with its recipe instead of dropping the item.
+    - Fixed the controller item being dropped on the ground when its Trainbuilder changes (a wagon added or removed). It now goes to the player or robot that caused the change, and is only dropped when that is not possible.
   Changes:
     - Trainbuilder numbers are no longer renumbered when a Trainbuilder is removed.
     - Reorganised the script files into scripts/<area>/ folders (no gameplay change).

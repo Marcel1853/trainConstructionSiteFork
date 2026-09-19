@@ -75,7 +75,7 @@ function Trainassembly:onBuildEntity(createdEntity, playerIndex)
       end
 
       -- STEP 4: Save the newly made trainassembly to our data structure so we can keep track of it
-      self:saveNewStructure(machineEntity, machineRenderID)
+      self:saveNewStructure(machineEntity, machineRenderID, playerIndex and {playerIndex = playerIndex} or nil)
       if Traincontroller and Traincontroller.processPendingControllers then
         Traincontroller:processPendingControllers()
       end
@@ -170,7 +170,7 @@ function Trainassembly:onRemoveEntity(removedEntity, buffer)
     end
 
     -- STEP 3: Update the data structure
-    self:deleteBuilding(removedEntity)
+    self:deleteBuilding(removedEntity, buffer and {buffer = buffer} or nil)
 
   elseif removedEntity.type == "straight-rail" or removedEntity.type == "legacy-straight-rail" then
     -- A rail under a Trainbuilder is removed (e.g. bots deconstruct the whole area and take
@@ -186,6 +186,8 @@ function Trainassembly:onRemoveEntity(removedEntity, buffer)
           allow_belts = false,
         }
       end
+      -- clean up the data first, so the controller item lands in the same buffer as well
+      self:onRemoveEntity(machineEntity, buffer)
       machineEntity.destroy{raise_destroy = true}
     end
 

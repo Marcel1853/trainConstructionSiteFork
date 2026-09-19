@@ -67,7 +67,7 @@ local function findNeighbour(machineEntity, offset)
 end
 
 -- Hängt einen frisch gespeicherten Wagen an einen Builder an (neu, verlängern oder zwei verbinden).
-function Trainassembly:addToTrainBuilder(machineEntity)
+function Trainassembly:addToTrainBuilder(machineEntity, receiver)
   local surfaceIndex = machineEntity.surface.index
   local position = machineEntity.position
 
@@ -89,7 +89,7 @@ function Trainassembly:addToTrainBuilder(machineEntity)
   local targetIndex = neighbourIndices[1]
   local locations = {}
   for _, neighbourIndex in pairs(neighbourIndices) do
-    Traincontroller:onTrainbuilderAltered(neighbourIndex)
+    Traincontroller:onTrainbuilderAltered(neighbourIndex, receiver)
     for _, location in pairs(storage.TA_data["trainBuilders"][neighbourIndex] or {}) do
       locations[#locations + 1] = location
     end
@@ -105,7 +105,7 @@ function Trainassembly:addToTrainBuilder(machineEntity)
 end
 
 -- Nimmt einen Wagen aus seinem Builder. Liegt er in der Mitte, wird der Builder geteilt.
-function Trainassembly:removeFromTrainBuilder(machineEntity)
+function Trainassembly:removeFromTrainBuilder(machineEntity, receiver)
   local surfaceIndex = machineEntity.surface.index
   local position = machineEntity.position
   local assemblerData = self:getAssemblerData(surfaceIndex, position)
@@ -115,7 +115,7 @@ function Trainassembly:removeFromTrainBuilder(machineEntity)
   local builder = trainBuilderIndex and storage.TA_data["trainBuilders"][trainBuilderIndex]
   if not builder then return end
 
-  Traincontroller:onTrainbuilderAltered(trainBuilderIndex)
+  Traincontroller:onTrainbuilderAltered(trainBuilderIndex, receiver)
 
   local axis = isVertical(assemblerData["direction"] or machineEntity.direction) and "y" or "x"
   local before, after = {}, {}

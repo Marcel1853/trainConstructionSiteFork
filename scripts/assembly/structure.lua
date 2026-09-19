@@ -5,7 +5,7 @@
 -- Setter functions to alter data into the data structure
 --------------------------------------------------------------------------------
 -- Save a new trainassembly to our data structure
-function Trainassembly:saveNewStructure(machineEntity, machineRenderID)
+function Trainassembly:saveNewStructure(machineEntity, machineRenderID, receiver)
   -- With this function we save all the data we want about a trainassembly.
   -- To index all machines we need a (unique) way of storing all the data,
   -- here we chose to index it by its location, since only 1 building can
@@ -48,12 +48,12 @@ function Trainassembly:saveNewStructure(machineEntity, machineRenderID)
 
   -- STEP 3: Link this assembler to its neighbours (same or new trainBuilder),
   --         see scripts/assembly/builders.lua
-  self:addToTrainBuilder(machineEntity)
+  self:addToTrainBuilder(machineEntity, receiver)
 end
 
 
 
-function Trainassembly:deleteBuilding(machineEntity)
+function Trainassembly:deleteBuilding(machineEntity, receiver)
   --Step 1: check if the machineEntity is valid.
   if not (machineEntity and machineEntity.valid) then
     return nil
@@ -66,7 +66,7 @@ function Trainassembly:deleteBuilding(machineEntity)
 
   --Step 2: take the assembler out of its trainBuilder (splits the builder if needed),
   --        see scripts/assembly/builders.lua
-  self:removeFromTrainBuilder(machineEntity)
+  self:removeFromTrainBuilder(machineEntity, receiver)
 
   -- STEP 3: Deleting the trainAssembler
   storage.TA_data["trainAssemblers"][machineSurface.index][machinePosition.y][machinePosition.x] = nil
