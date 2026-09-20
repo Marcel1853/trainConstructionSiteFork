@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
 
-local trainsToIgnore = require("prototypes/modded-trains-to-ignore")
-local itemOverride   = require("prototypes/modded-trains-item-override")
+local trainsToIgnore = require("prototypes/modded/trains-to-ignore")
+local itemOverride   = require("prototypes/modded/trains-item-override")
 
 -- For each train type like item we want to make an equal fluid
 -- To accuire all the itemnames, we have to iterate over the entities

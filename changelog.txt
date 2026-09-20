@@ -1,4 +1,36 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.5.8
+Date: 20. 09. 2026
+  Features:
+    - Trainbuilders placed by hand now snap onto the fixed spacing of a neighbouring Trainbuilder, so you no longer have to find the exact gap yourself. Can be turned off per player.
+    - While holding the Trainbuilder item, the free places next to existing Trainbuilders are marked. Can be turned off per player.
+  Bugfixes:
+    - Fixed Trainbuilder data getting corrupted when robots deconstruct Trainbuilders (controllers pointed to the wrong or an empty Trainbuilder, which caused crashes later).
+    - Fixed Trainbuilders staying behind without rails when the rail underneath was removed first. The Trainbuilder item is now returned.
+    - Fixed possible crashes when removing a Trainbuilder or controller whose data was already removed.
+    - Fixed a crash when placing a controller next to a Trainbuilder whose data pointed to a removed Trainbuilder.
+    - Fixed controllers placed side by side possibly linking to the neighbouring Trainbuilder. A controller now only links to a Trainbuilder on its own axis that has no controller yet.
+    - Fixed Trainbuilders not being placeable on legacy straight rails.
+    - Fixed the Trainbuilder item not being placeable as a ghost (shift-click); it was flagged not-blueprintable, which also forbids ghosts.
+    - Fixed building a Trainbuilder deleting the ghost of the neighbouring Trainbuilder 7 tiles away, which silently removed Trainbuilders from blueprints.
+    - Fixed robots building a Trainbuilder before the rail ghost underneath it: the ghost is put back with its recipe instead of dropping the item.
+    - Fixed a possible crash when the controller that was next in line got removed in the same tick.
+    - Fixed a copied Trainbuilder controller or depot (blueprint, copy-paste) losing its station name, which broke the link between controller and depot and reset the depot request count.
+    - Fixed the controller being removed when robots add the last wagon of a blueprint. A controller whose Trainbuilder changes now waits until it fits again and only gives its item back after 30 seconds.
+    - Fixed the controller item being dropped on the ground when its Trainbuilder changes (a wagon added or removed). It now goes to the player or robot that caused the change, and is only dropped when that is not possible.
+  Locale:
+    - The last two hard coded English messages are now translated (English and German).
+  Changes:
+    - The mod's own "Transport Logistics" item group is removed again when nothing ends up in it, for example when another mod sorts all train items into its own group. Before, an empty tab was left in the crafting menu.
+    - The Trainbuilder update and the controllers waiting for their Trainbuilder now share a single heartbeat instead of registering two separate on_nth_tick handlers.
+    - Trainbuilder numbers are no longer renumbered when a Trainbuilder is removed.
+    - Reorganised the script files into scripts/<area>/ folders (no gameplay change).
+  Scripting:
+    - Added remote functions "get_snap_position" and "get_placing_help_slots" to the "trainConstructionSite" interface.
+    - Added remote function "rebuild_train_builders" to the "trainConstructionSite" interface (repairs Trainbuilder data).
+  Info:
+    - Existing saves are repaired automatically by a migration.
+---------------------------------------------------------------------------------------------------
 Version: 0.5.7
 Date: 29. 06. 2026
   Bugfixes:

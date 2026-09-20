@@ -4,7 +4,7 @@
 -------------------------------------------------------------------------------
 require "modding-interface"
 local trainfuel = "trainassembly-recipefuel"
-local itemOrder = require("prototypes/modded-trains-ordening")
+local itemOrder = require("prototypes/modded/trains-ordening")
 local trainRecipe = require("compat.train_recipe")
 
 -- TCS final compatibility safety wrappers -------------------------------------
@@ -198,7 +198,7 @@ end
 -------------------------------------------------------------------------------
 -- Other changes --------------------------------------------------------------
 -------------------------------------------------------------------------------
-local trainOrdering = require("prototypes.modded-trains-ordening")
+local trainOrdering = require("prototypes.modded.trains-ordening")
 local collision_mask_util = require("collision-mask-util")
 
 if mods["FARL"] then

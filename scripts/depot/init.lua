@@ -1,10 +1,10 @@
 ---@diagnostic disable: undefined-global, inject-field, assign-type-mismatch, param-type-mismatch, redundant-parameter, missing-fields, deprecated, duplicate-set-field, different-requires, redefined-local, undefined-field, need-check-nil, cast-local-type
-require 'util'
-require("compat.lslib")
+-- Traindepot: Depots (Zughalte), zu denen fertige Züge fahren. GUI in scripts/gui/depot/.
+
+Traindepot = {}
+require("scripts.gui.depot.init")
 
 -- Create class
-Traindepot = {}
-require 'src.traindepot-gui'
 
 --------------------------------------------------------------------------------
 -- Initiation of the class
@@ -286,13 +286,33 @@ end
 -- Behaviour functions, mostly event handlers
 --------------------------------------------------------------------------------
 -- When a player builds a new entity
+-- Trägt das Depot schon einen Namen, der etwas bedeutet? Das ist der Fall, wenn es bereits ein
+-- Depot oder einen Controller dieses Namens gibt (Kopie einer Anlage). Nur dann darf der Name
+-- beim Bauen nicht durch den Standardnamen ersetzt werden.
+function Traindepot:hasUsefulStationName(depotEntity)
+  local stationName = depotEntity.backer_name
+  if not stationName or stationName == "" then return false end
+
+  local depotForceName = depotEntity.force.name
+  local surfaceIndex = depotEntity.surface.index
+  if self:getDepotStationCount(depotForceName, surfaceIndex, stationName) > 0 then return true end
+  return Traincontroller:getTrainBuilderCount(
+    Traincontroller:getControllerForceName(depotForceName), surfaceIndex, stationName) > 0
+end
+
 function Traindepot:onBuildEntity(createdEntity)
   if createdEntity.name == self:getDepotEntityName() then
+    -- A copy (blueprint) already carries its name: keep it, the controllers find their depot by
+    -- that name. Check before saving, saving counts this depot as well.
+    local keepStationName = self:hasUsefulStationName(createdEntity)
+
     self:saveNewStructure(createdEntity)
     self:setTrainstopControlBehaviour(createdEntity)
 
-    -- after structure is saved, we rename it, this will trigger Traindepot:onRenameEntity as well
-    createdEntity.backer_name = "Unused Traindepot"
+    if not keepStationName then
+      -- after structure is saved, we rename it, this will trigger Traindepot:onRenameEntity as well
+      createdEntity.backer_name = "Unused Traindepot"
+    end
     if Traincontroller and Traincontroller.processPendingControllers then
       Traincontroller:processPendingControllers()
     end

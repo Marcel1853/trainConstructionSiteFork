@@ -1,133 +1,121 @@
-name: Auto Release & Upload Factorio Mod
+# Baut bei jedem Push auf master die Mod-Zip und lädt sie aufs Mod-Portal – aber nur, wenn die
+# Version in info.json dort neu ist. Gibt es auf GitHub noch kein Release für die Version, legt er
+# eins an (Tag vX.Y.Z, Zip als Download, Text = Abschnitt der Version aus changelog.txt).
+# Gepackt wird mit tools/package.sh: ohne tools/, docs/, .github/, .vscode/, CLAUDE.md usw.
+# (dieselbe Zip wie lokal).
+#
+# Voraussetzungen:
+#   - Secret FACTORIO_MOD_PORTAL_TOKEN (API-Schlüssel von factorio.com mit Recht „ModPortal: Upload Mods“).
+#   - Die ERSTE Veröffentlichung von Hand im Mod-Portal hochladen: init_upload geht nur für Mods,
+#     die es dort schon gibt. Danach laufen alle neuen Versionen über diesen Workflow.
+name: Release auf dem Mod-Portal
 
 on:
   push:
     branches:
       - master
 
+permissions:
+  contents: write # für Release-Branch, Tag und GitHub-Release
+
 jobs:
-  build_and_upload:
+  release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Repository auschecken
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install jq, zip, rsync
+      - name: Werkzeuge installieren
         run: sudo apt-get install -y jq zip rsync
 
-      - name: Read mod info
+      - name: Mod-Name und Version lesen
         id: info
         run: |
-          NAME=$(jq -r '.name' info.json)
-          VERSION=$(jq -r '.version' info.json)
-          echo "name=$NAME" >> $GITHUB_OUTPUT
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "�0�7 Mod: $NAME"
-          echo "�9�4 Version: $VERSION"
-          
-          # Kurze Pause, damit GitHub Actions alles richtig verarbeitet
-          sleep 2
+          echo "name=$(jq -r '.name' info.json)" >> "$GITHUB_OUTPUT"
+          echo "version=$(jq -r '.version' info.json)" >> "$GITHUB_OUTPUT"
 
-      - name: Check latest version on Mod Portal
+      - name: Version auf dem Mod-Portal prüfen
         id: check
         run: |
-          echo "�9�3 Checking existing mod on Factorio portal..."
-          RESPONSE=$(curl -s https://mods.factorio.com/api/v2/mods/${{ steps.info.outputs.name }})
-
-          # Pr��fen, ob g��ltiges JSON zur��ckkommt
-          if echo "$RESPONSE" | jq . >/dev/null 2>&1; then
-            LATEST=$(echo "$RESPONSE" | jq -r '.releases[-1].version // "none"')
-            echo "Latest version on portal: $LATEST"
+          RESPONSE=$(curl -s "https://mods.factorio.com/api/mods/${{ steps.info.outputs.name }}")
+          if echo "$RESPONSE" | jq -e '.releases' >/dev/null 2>&1; then
+            FOUND=$(echo "$RESPONSE" | jq -r --arg v "${{ steps.info.outputs.version }}" '[.releases[].version] | index($v) != null')
           else
-            echo "�7�2�1�5 No valid JSON from portal �� probably first upload or mod not found."
-            LATEST="none"
+            echo "Mod noch nicht auf dem Portal – die erste Version bitte von Hand hochladen."
+            FOUND="missing"
+          fi
+          echo "Version ${{ steps.info.outputs.version }} schon auf dem Portal: $FOUND"
+          echo "found=$FOUND" >> "$GITHUB_OUTPUT"
+
+      - name: GitHub-Release prüfen
+        id: gh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "v${{ steps.info.outputs.version }}" >/dev/null 2>&1; then
+            echo "missing=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Noch kein GitHub-Release für v${{ steps.info.outputs.version }}."
+            echo "missing=true" >> "$GITHUB_OUTPUT"
           fi
 
-          echo "latest=$LATEST" >> $GITHUB_OUTPUT
-
-      - name: Pause before comparison
-        run: sleep 2
-
-      - name: Skip if version unchanged
-        if: ${{ steps.info.outputs.version == steps.check.outputs.latest }}
+      - name: Zip bauen
+        if: steps.check.outputs.found == 'false' || steps.gh.outputs.missing == 'true'
         run: |
-          echo "Version ${{ steps.info.outputs.version }} already on portal �C skipping upload."
-          exit 0
+          bash tools/package.sh
+          echo "ZIP=dist/${{ steps.info.outputs.name }}_${{ steps.info.outputs.version }}.zip" >> "$GITHUB_ENV"
 
-      - name: Prepare mod folder
-        run: |
-          mkdir -p build/${{ steps.info.outputs.name }}
-          rsync -av --exclude 'build' --exclude '.git*' ./ build/${{ steps.info.outputs.name }}/
-
-      - name: Create ZIP archive
-        working-directory: build
-        run: |
-          zip -r "../${{ steps.info.outputs.name }}_${{ steps.info.outputs.version }}.zip" "${{ steps.info.outputs.name }}"
-          echo "�7�3 Created ${{ steps.info.outputs.name }}_${{ steps.info.outputs.version }}.zip"
-      
-      - name: Pause before upload
-        run: sleep 2
-
-      - name: Initialize upload (init_upload)
+      - name: Upload anfordern (init_upload)
         id: init
+        if: steps.check.outputs.found == 'false'
         run: |
-          echo "�9�9 Requesting upload URL..."
           RESPONSE=$(curl -s -X POST \
             -H "Authorization: Bearer ${{ secrets.FACTORIO_MOD_PORTAL_TOKEN }}" \
             -F "mod=${{ steps.info.outputs.name }}" \
             https://mods.factorio.com/api/v2/mods/releases/init_upload)
-
-          if echo "$RESPONSE" | jq . >/dev/null 2>&1; then
-            UPLOAD_URL=$(echo "$RESPONSE" | jq -r '.upload_url // empty')
-          else
-            echo "�7�4 Invalid response from init_upload"
-            echo "$RESPONSE"
-            exit 1
-          fi
-
+          UPLOAD_URL=$(echo "$RESPONSE" | jq -r '.upload_url // empty' 2>/dev/null || true)
           if [ -z "$UPLOAD_URL" ]; then
-            echo "�7�4 Failed to get upload URL"
+            echo "Keine Upload-Adresse erhalten:"
             echo "$RESPONSE"
             exit 1
           fi
+          echo "upload_url=$UPLOAD_URL" >> "$GITHUB_OUTPUT"
 
-          echo "upload_url=$UPLOAD_URL" >> $GITHUB_OUTPUT
-          echo "�7�3 Got upload URL."
-
-      - name: Finish upload (finish_upload)
+      - name: Zip hochladen (finish_upload)
+        if: steps.check.outputs.found == 'false'
         run: |
-          echo "�8�8�1�5 Uploading mod to Factorio Mod Portal..."
-          RESPONSE=$(curl -s -X POST \
-            -F "file=@${{ steps.info.outputs.name }}_${{ steps.info.outputs.version }}.zip" \
-            "${{ steps.init.outputs.upload_url }}")
-
-          echo "Portal response:"
-          echo "$RESPONSE"
-
-          if echo "$RESPONSE" | grep -q '"error"'; then
-            echo "�7�4 Upload failed."
+          RESPONSE=$(curl -s -X POST -F "file=@$ZIP" "${{ steps.init.outputs.upload_url }}")
+          echo "Antwort des Portals: $RESPONSE"
+          if echo "$RESPONSE" | jq -e '.error' >/dev/null 2>&1; then
+            echo "Hochladen fehlgeschlagen."
             exit 1
           fi
 
-          echo "�7�3 Upload complete."
-
-      - name: Update or create release branch
+      - name: Release-Branch setzen
+        if: steps.check.outputs.found == 'false' || steps.gh.outputs.missing == 'true'
         run: |
-          echo "�9�4 Updating release branch..."
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git fetch origin || true
           git checkout -B release
-          git merge --no-ff origin/main -m "Release ${{ steps.info.outputs.version }}" || true
           git push origin release --force
-          echo "�7�3 Release branch updated."
 
-      - name: Create git tag
+      - name: GitHub-Release anlegen
+        if: steps.gh.outputs.missing == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="v${{ steps.info.outputs.version }}"
-          git tag -f "$TAG"
-          git push origin "$TAG" --force
-          echo "�9�5�1�5 Created tag $TAG"
+          VERSION="${{ steps.info.outputs.version }}"
+          # Abschnitt dieser Version aus changelog.txt (bis zur nächsten Trennlinie)
+          awk -v v="$VERSION" '
+            /^-+$/ { if (found) exit; next }
+            $0 ~ "^Version: " v "$" { found = 1; next }
+            found { print }
+          ' changelog.txt > release-notes.md
+          [ -s release-notes.md ] || echo "Version $VERSION" > release-notes.md
+          gh release create "v$VERSION" "$ZIP" \
+            --title "Train Construction Site Fork $VERSION" \
+            --notes-file release-notes.md \
+            --target "${{ github.sha }}"

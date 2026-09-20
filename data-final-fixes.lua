@@ -4,4 +4,6 @@ require "prototypes.item.trainassembly-resultParts-final-fixes"
 
 require "prototypes.fluid.trainassembly-resultFluid-final-fixes"
 
-require "prototypes.modded-final-fixes"
+require "prototypes.modded.final-fixes"
+
+require "prototypes.modded.group-cleanup" -- muss zuletzt laufen: entfernt die eigene Gruppe, wenn sie leer ist
