@@ -21,6 +21,7 @@ Date: 19. 09. 2026
   Locale:
     - The last two hard coded English messages are now translated (English and German).
   Changes:
+    - The mod's own "Transport Logistics" item group is removed again when nothing ends up in it, for example when another mod sorts all train items into its own group. Before, an empty tab was left in the crafting menu.
     - The Trainbuilder update and the controllers waiting for their Trainbuilder now share a single heartbeat instead of registering two separate on_nth_tick handlers.
     - Trainbuilder numbers are no longer renumbered when a Trainbuilder is removed.
     - Reorganised the script files into scripts/<area>/ folders (no gameplay change).
