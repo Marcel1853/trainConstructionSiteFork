@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.5.8
-Date: 19. 09. 2026
+Date: 20. 09. 2026
   Features:
     - Trainbuilders placed by hand now snap onto the fixed spacing of a neighbouring Trainbuilder, so you no longer have to find the exact gap yourself. Can be turned off per player.
     - While holding the Trainbuilder item, the free places next to existing Trainbuilders are marked. Can be turned off per player.

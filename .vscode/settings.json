@@ -43,5 +43,8 @@
     "undefined-global"
     ],
     "http.proxyStrictSSL": false,
-    "json.schemaDownload.enable": true
+    "json.schemaDownload.enable": true,
+    "Lua.workspace.userThirdParty": [
+        "/home/marcel/.config/Code/User/workspaceStorage/08df97b67d57f395e3f0a792ceb98a39/justarandomgeek.factoriomod-debug/sumneko-3rd"
+    ]
 }
